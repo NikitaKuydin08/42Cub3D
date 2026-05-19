@@ -12,3 +12,14 @@
 
 #include "../includes/cub3d.h"
 
+// void	raycasting(t_data *data)
+// {
+// 	int	x;
+// 	int	y;
+
+// 	y = 0;
+// 	while (y < data->win_height)
+// 	{
+		
+// 	}
+// }

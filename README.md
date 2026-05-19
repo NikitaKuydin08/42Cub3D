@@ -67,10 +67,10 @@ EA ./textures/east.png
 F 220,100,0
 C 225,30,0
 
-        1111111111111111
-        1000000000000001
-        1011000001110001
-        1001000000000001
+	1111111111111111
+	1000000000000001
+	1011000001110001
+	1001000000000001
 1111111111011000001110001
 100000000011000000010001
 101111111111111111110000001
@@ -96,11 +96,13 @@ C 225,30,0
 
 ## Main Concepts
 
+**"See kids, this is why you need to learn Pythagoras and trig at school. Those normal vectors won't calculate themselves ;-)"**
+
 Vector describes how much of something there is and where it is going. Vector is used for representing the direction the player is currently facing. A vector in 2D coordinate system are usually considered to be X and Y components. V = (Vx, Vy);
 
-RayCasting - technique that transform a limited form of data into a 3D projectionby tracing rays from the viewpoint into the viewing volume RayCasting is much faster than RayTracing. The first uses much smaller amount of a rays for a window than the second. 
+RayCasting - technique that transform a limited form of data into a 3D projectionby tracing rays from the viewpoint into the viewing volume RayCasting is much faster than RayTracing. The first uses much smaller amount of a rays for a window than the second.
 
-In raycasting, walls are always 90 degrees angle with the floor. Thus, the viewpoint cannot be rotated along the Z axis. 
+In raycasting, walls are always 90 degrees angle with the floor. Floor and ceiling are untextured. Thus, the viewpoint cannot be rotated along the Z axis. 
 
 The following attributes needed before the world could be projected and rendered:
 1. Player's height, player's field of view(FOV), and player's position.
@@ -125,6 +127,12 @@ Multiplying cos of the angle between two rays to the length of a single ray, to 
 
 ![alt text](image-1.png)
 
+When the player rotates, the camera has to rotate, so both the direction vector and the plane vector have to be rotated. To rotate a vector, the rotation matrix from linear algebra has to be used. The matrix:
+
+R = [cos θ  -sin θ]; [sin θ   cos θ]. Rotates points in the xy plan counterclockwise through an angle θ about the origin.
+
+![alt text](image-3.png)
+
 ## Resources
 
 - [RayCasting in Cub3D Medium Tutorial](https://devabdilah.medium.com/3d-ray-casting-game-with-cub3d-7a116376056a)
@@ -133,3 +141,4 @@ Multiplying cos of the angle between two rays to the length of a single ray, to 
 - [Lode's Computer Graphics Tutorial - RayCasting](https://lodev.org/cgtutor/raycasting.html)
 - [Someone's Cub3D Explanation](https://hackmd.io/@nszl/H1LXByIE2#Map-parsing-and-validating)
 - [RayCasting Crazy Explanation in Russian Language](https://www.youtube.com/watch?v=XWCHl0rpBj4)
+- [The Best Explanation for people who love visualise](https://www.youtube.com/watch?v=eOCQfxRQ2pY)

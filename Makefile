@@ -21,6 +21,7 @@ SRC = main.c \
 	parsing/check_map_closure.c \
 	render/draw_game.c \
 	render/raycasting.c \
+	render/prep_game.c \
 	utils/error.c \
 	utils/free_data.c
 

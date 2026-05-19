@@ -14,6 +14,9 @@
 
 void	init_textures(t_texrgbinfo *texinfo)
 {
+	int	i;
+
+	i = -1;
 	texinfo->north = NULL;
 	texinfo->south = NULL;
 	texinfo->east = NULL;
@@ -22,6 +25,8 @@ void	init_textures(t_texrgbinfo *texinfo)
 	texinfo->ceiling = NULL;
 	texinfo->hex_ceiling = 0;
 	texinfo->hex_floor = 0;
+	while (++i < 4)
+		texinfo->tex[i] = NULL;
 }
 
 void	init_player(t_player *player)
@@ -31,6 +36,10 @@ void	init_player(t_player *player)
 	player->y = 0;
 	player->pos_x = 0.0;
 	player->pos_y = 0.0;
+	player->dir_x = 0.0;
+	player->dir_y = 0.0;
+	player->plane_x = 0.0;
+	player->plane_y = 0.0;
 }
 
 void	init_data(t_data *data)

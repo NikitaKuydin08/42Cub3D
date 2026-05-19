@@ -29,6 +29,13 @@
 # define WIN_WIDTH 800
 # define FOV 60
 
+# define NORTH 0
+# define SOUTH 1
+# define WEST 2
+# define EAST 3
+
+# define MOVE_SPEED 2
+
 // ERROR MESSAGES //
 # define USAGE "Usage: ./cub3d <path/to/map.cub>"
 # define FILE_NOT_EXIST "File doesn't exist"
@@ -67,15 +74,15 @@ char (including signs)"
 // STRUCTURES //
 typedef struct s_texrgbinfo
 {
-	char		*north;
-	char		*south;
-	char		*west;
-	char		*east;
-	char		*floor;
-	char		*ceiling;
-	uint32_t	hex_floor;
-	uint32_t	hex_ceiling;
-
+	char			*north;
+	char			*south;
+	char			*west;
+	char			*east;
+	char			*floor;
+	char			*ceiling;
+	uint32_t		hex_floor;
+	uint32_t		hex_ceiling;
+	mlx_texture_t	*tex[4];
 }	t_texrgbinfo;
 
 typedef struct s_player
@@ -85,6 +92,12 @@ typedef struct s_player
 	int		y;
 	double	pos_x;
 	double	pos_y;
+	double	dir_x;
+	double	dir_y;
+	double	plane_x;
+	double	plane_y;
+	int		move_speed;
+	int		rot_speed;
 
 }	t_player;
 
@@ -140,6 +153,7 @@ int		map_copy_into_file(char *arg, t_data *data);
 int		check_file(char *arg, bool cub);
 
 //				RENDERING - RAY CASTING				//
+void	prep_game(t_data *data);
 void	draw_game(t_data *data);
 
 // CONTROLS //

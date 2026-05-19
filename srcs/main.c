@@ -16,7 +16,7 @@
 
 void	start_game(t_data *data)
 {
-	// prep_player(data);
+	prep_game(data);
 	data->mlx = mlx_init(data->win_width, data->win_height, "cub3d", false);
 	if (!data->mlx)
 	{
@@ -24,8 +24,8 @@ void	start_game(t_data *data)
 		ft_error(data, 1);
 	}
 	draw_game(data);
-	mlx_key_hook(data->mlx, key_hook, data);
-	mlx_loop_hook(data->mlx, loop_hook, data);
+	// mlx_key_hook(data->mlx, key_hook, data);
+	// mlx_loop_hook(data->mlx, loop_hook, data);
 	mlx_loop(data->mlx);
 	mlx_terminate(data->mlx);
 	free(data);
