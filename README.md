@@ -133,6 +133,8 @@ R = [cos θ  -sin θ]; [sin θ   cos θ]. Rotates points in the xy plan counterc
 
 ![alt text](image-3.png)
 
+
+
 ## Resources
 
 - [RayCasting in Cub3D Medium Tutorial](https://devabdilah.medium.com/3d-ray-casting-game-with-cub3d-7a116376056a)

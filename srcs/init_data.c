@@ -42,6 +42,29 @@ void	init_player(t_player *player)
 	player->plane_y = 0.0;
 }
 
+void	init_ray(t_ray *ray)
+{
+	ray->cameraX = 0;
+	ray->ray_x = 0.0;
+	ray->ray_y = 0.0;
+	ray->map_x = 0;
+	ray->map_y = 0;
+	ray->sidedist_x = 0.0;
+	ray->sidedist_y = 0.0;
+	ray->deltadist_x = 0.0;
+	ray->deltadist_y = 0.0;
+}
+
+void	init_raycasting_dda(t_ray *ray, int x, t_player *player)
+{
+	init_ray(ray);
+	ray->cameraX = 2 * x / (double)WIN_WIDTH - 1;
+	ray->ray_x = player->dir_x + player->plane_x * ray->cameraX;
+	ray->ray_y = player->dir_y + player->plane_y * ray->cameraX;
+	ray->map_x = (int)player->pos_x;
+	ray->map_y = (int)player->pos_y;
+}
+
 void	init_data(t_data *data)
 {
 	data->mlx = NULL;

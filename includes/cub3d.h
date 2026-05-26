@@ -85,6 +85,19 @@ typedef struct s_texrgbinfo
 	mlx_texture_t	*tex[4];
 }	t_texrgbinfo;
 
+typedef struct s_ray
+{
+	double	cameraX;
+	double	ray_x;
+	double	ray_y;
+	int		map_x;
+	int		map_y;
+	double	sidedist_x;
+	double	sidedist_y;
+	double	deltadist_x;
+	double	deltadist_y;
+}	t_ray;
+
 typedef struct s_player
 {
 	char	orientation;
@@ -123,10 +136,12 @@ typedef struct s_data
 
 	t_player		player;
 	t_texrgbinfo	texrgbinfo;
+	t_ray			ray;
 }	t_data;
 
 void	init_data(t_data *data);
-void	init_mlx(t_data *cub3d);
+void	init_raycasting_dda(t_ray *ray, int x, t_player *player);   
+void	init_ray(t_ray *ray);
 
 // CHECK_MAP_CLOSURE //
 int		check_closure(t_data *data, char **map);

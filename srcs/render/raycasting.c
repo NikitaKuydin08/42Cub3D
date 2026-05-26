@@ -12,14 +12,16 @@
 
 #include "../includes/cub3d.h"
 
-// void	raycasting(t_data *data)
-// {
-// 	int	x;
-// 	int	y;
+void	raycasting(t_player *player, t_data *data)
+{
+    t_ray   ray;
+    int	x;
 
-// 	y = 0;
-// 	while (y < data->win_height)
-// 	{
-		
-// 	}
-// }
+    ray = data->ray;
+	x = 0;
+	while (x < data->win_width)
+	{
+		init_raycasting_dda(&ray, x, player);
+	}
+}
+
