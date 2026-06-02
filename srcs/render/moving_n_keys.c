@@ -22,6 +22,7 @@
 //	MLX_KEY_DOWN			= 264,
 //	MLX_KEY_UP				= 265,
 
+/*
 void	key_hook(mlx_key_data_t keydata, void *param)
 {
 	t_data	*data;
@@ -55,3 +56,4 @@ void	loop_hook(void *param)
 		data->needs_redraw = false;
 	}
 }
+*/

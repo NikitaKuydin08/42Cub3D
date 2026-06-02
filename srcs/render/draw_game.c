@@ -38,7 +38,7 @@ void	draw_floor_n_ceiling(t_data *data)
 	}
 }
 
-void	draw_game(t_data *data)
+void	draw_game(t_data *data, t_player *player)
 {
 	data->image = mlx_new_image(data->mlx, data->win_width,
 			data->win_height);
@@ -49,7 +49,7 @@ void	draw_game(t_data *data)
 		ft_error(data, 1);
 	}
 	draw_floor_n_ceiling(data);
-	// raycasting(data);
+	raycasting(player, data);
 	if (mlx_image_to_window(data->mlx, data->image, 0, 0) < 0)
 	{
 		ft_putstr_fd("data: Error: mlx: Could not draw a new image", 2);

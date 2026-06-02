@@ -23,7 +23,7 @@ void	start_game(t_data *data)
 		ft_putstr_fd("data: Error: mlx: Could not initialize mlx", 2);
 		ft_error(data, 1);
 	}
-	draw_game(data);
+	draw_game(data, &data->player);
 	// mlx_key_hook(data->mlx, key_hook, data);
 	// mlx_loop_hook(data->mlx, loop_hook, data);
 	mlx_loop(data->mlx);

@@ -28,6 +28,7 @@
 # define WIN_HEIGHT 800
 # define WIN_WIDTH 800
 # define FOV 60
+# define PI 3.14159265359
 
 # define NORTH 0
 # define SOUTH 1
@@ -92,10 +93,19 @@ typedef struct s_ray
 	double	ray_y;
 	int		map_x;
 	int		map_y;
-	double	sidedist_x;
-	double	sidedist_y;
-	double	deltadist_x;
-	double	deltadist_y;
+	double	sideDistX;
+	double	sideDistY;
+	double	deltaDistX;
+	double	deltaDistY;
+	int		stepX;
+	int		stepY;
+	int		hit;
+	int		side;
+	double	DistWall;
+	int		drawStart;
+	int		drawEnd;
+	int		lineHeight;
+	double	pos_on_wall;
 }	t_ray;
 
 typedef struct s_player
@@ -169,7 +179,8 @@ int		check_file(char *arg, bool cub);
 
 //				RENDERING - RAY CASTING				//
 void	prep_game(t_data *data);
-void	draw_game(t_data *data);
+void	draw_game(t_data *data, t_player *player);
+void	raycasting(t_player *player, t_data *data);
 
 // CONTROLS //
 void	key_hook(mlx_key_data_t keydata, void *param);
@@ -180,5 +191,13 @@ int		print_err_msg(char *msg);
 void	ft_error(t_data *data, int exit_code);
 int		free_data(t_data *data);
 void	free_tab(char **tab);
+
+// PREPARE GAME //
+void	setup_jump_algo(t_ray *ray, t_player *player);
+
+// MOVING AND KEYS IMPLEMENTATION //
+void	loop_hook(void *param);
+void	key_hook(mlx_key_data_t keydata, void *param);
+
 
 #endif
