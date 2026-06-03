@@ -22,28 +22,27 @@
 //	MLX_KEY_DOWN			= 264,
 //	MLX_KEY_UP				= 265,
 
-/*
-void	key_hook(mlx_key_data_t keydata, void *param)
-{
-	t_data	*data;
+// void	key_hook(mlx_key_data_t keydata, void *param)
+// {
+// 	t_data	*data;
 
-	data = (t_data *)param;
-	if (keydata.key == 256 && keydata.action == 1)
-		mlx_close_window(data->mlx);
-	else if (keydata.key == 87 || keydata.key == 265)
-		ft_move(data, 0);
-	else if (keydata.key == 83 || keydata.key == 264)
-		ft_move(data, 1);
-	else if (keydata.key == 65)
-		ft_move(data, 2);
-	else if (keydata.key == 68)
-		ft_move(data, 3);
-	else if (keydata.key == 263)
-		// view change left
-	else if (keydata.key == 262)
-		// view change right
-	data->needs_redraw = true;
-}
+// 	data = (t_data *)param;
+// 	if (keydata.key == 256 && keydata.action == 1)
+// 		mlx_close_window(data->mlx);
+// 	else if (keydata.key == 87 || keydata.key == 265)
+// 		ft_move(data, 0);
+// 	else if (keydata.key == 83 || keydata.key == 264)
+// 		ft_move(data, 1);
+// 	else if (keydata.key == 65)
+// 		ft_move(data, 2);
+// 	else if (keydata.key == 68)
+// 		ft_move(data, 3);
+// 	else if (keydata.key == 263)
+// 		// view change left
+// 	else if (keydata.key == 262)
+// 		// view change right
+// 	data->needs_redraw = true;
+// }
 
 void	loop_hook(void *param)
 {
@@ -52,8 +51,7 @@ void	loop_hook(void *param)
 	data = (t_data *)param;
 	if (data->needs_redraw)
 	{
-		draw_game(data);
+		draw_game(data, &data->player);
 		data->needs_redraw = false;
 	}
 }
-*/

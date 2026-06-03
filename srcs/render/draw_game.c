@@ -12,7 +12,25 @@
 
 #include "../includes/cub3d.h"
 
-void	draw_floor_n_ceiling(t_data *data)
+static void	draw_image(t_data *data)
+{
+	uint32_t	x;
+	uint32_t	y;
+
+	y = 0;
+	while (y < (uint32_t)data->win_height)
+	{
+		x = 0;
+		while (x < (uint32_t)data->win_width)
+		{
+			mlx_put_pixel(data->image, x, y, data->texture_pixels[x][y]);
+			x++;
+		}
+		y++;
+	}
+}
+
+static void	draw_floor_n_ceiling(t_data *data)
 {
 	uint32_t	x;
 	uint32_t	y;
@@ -50,6 +68,7 @@ void	draw_game(t_data *data, t_player *player)
 	}
 	draw_floor_n_ceiling(data);
 	raycasting(player, data);
+	draw_image(data);
 	if (mlx_image_to_window(data->mlx, data->image, 0, 0) < 0)
 	{
 		ft_putstr_fd("data: Error: mlx: Could not draw a new image", 2);

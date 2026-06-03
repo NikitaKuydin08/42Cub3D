@@ -32,8 +32,8 @@
 
 # define NORTH 0
 # define SOUTH 1
-# define WEST 2
-# define EAST 3
+# define EAST 2
+# define WEST 3
 
 # define MOVE_SPEED 2
 
@@ -73,6 +73,15 @@ char (including signs)"
 # define ERR_TAB "Tab character is not allowed in map, only spaces"
 
 // STRUCTURES //
+typedef struct	s_line
+{
+	int		x;
+	int		y;
+	double	step;
+	double	pos;
+
+}	t_line;
+
 typedef struct s_texrgbinfo
 {
 	char			*north;
@@ -84,6 +93,8 @@ typedef struct s_texrgbinfo
 	uint32_t		hex_floor;
 	uint32_t		hex_ceiling;
 	mlx_texture_t	*tex[4];
+	int				index;
+	t_line			line;
 }	t_texrgbinfo;
 
 typedef struct s_ray
@@ -143,7 +154,7 @@ typedef struct s_data
 	int				row_count;
 
 	bool			needs_redraw;
-
+	int				**texture_pixels;
 	t_player		player;
 	t_texrgbinfo	texrgbinfo;
 	t_ray			ray;

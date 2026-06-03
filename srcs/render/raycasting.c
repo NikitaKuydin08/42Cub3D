@@ -12,10 +12,52 @@
 
 #include "../includes/cub3d.h"
 
-// static void	draw_texture(t_ray *ray, t_data *data, t_texrgbinfo *tex, int x)
-// {
+static void	recognise_side_tex(t_texrgbinfo *texinfo, t_ray *ray)
+{
+	if (ray->side == 0)
+	{
+		if (ray->ray_x < 0)
+			texinfo->index = WEST;
+		else
+			texinfo->index = EAST;
+	}
+	else
+	{
+		if (ray->ray_y < 0)
+			texinfo->index = NORTH;
+		else
+			texinfo->index = SOUTH;
+	}
+}
 
-// }
+static void	draw_texture(t_ray *ray, t_data *data, t_texrgbinfo *t, int x)
+{
+	int	y;
+	uint32_t	color;
+	int			texHeight;
+
+	recognise_side_tex(t, ray);
+	texHeight = t->tex[t->index]->height;
+	t->line.x = (int)(ray->pos_on_wall * t->tex[t->index]->width);
+	if ((ray->side == 0 && ray->ray_x > 0)
+		|| (ray->side == 1 && ray->ray_y < 0))
+		t->line.x = t->tex[t->index]->width - t->line.x - 1;
+	t->line.step = 1.0 * texHeight / ray->lineHeight;
+	t->line.pos = (ray->drawStart - data->win_height / 2 + ray->lineHeight
+		/ 2) * t->line.step;
+	y = ray->drawStart;
+	while (y < ray->drawEnd)
+	{
+		t->line.y = (int)t->line.pos & (texHeight - 1);
+		t->line.pos += t->line.step;
+		color = (uint32_t)t->tex[t->index]->pixels[texHeight * t->line.y + t->line.x];
+		if (ray->side == 1)
+			color = (color >> 1) & 8355711;
+		if (color > 0)
+			data->texture_pixels[x][y] = color;
+		y++;
+	}
+}
 
 static void	distance_ray_to_wall(t_ray *ray, t_player *player, t_data *data)
 {
@@ -70,7 +112,7 @@ void	raycasting(t_player *player, t_data *data)
 		init_raycasting_dda(&ray, x, player);
 		do_dda(&ray, data);
 		distance_ray_to_wall(&ray, player, data);
-		// draw_texture(&ray, data, &data->texrgbinfo, x);
+		draw_texture(&ray, data, &data->texrgbinfo, x);
 		x++;
 	}
 }

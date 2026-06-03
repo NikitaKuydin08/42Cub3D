@@ -94,4 +94,5 @@ void	init_data(t_data *data)
 	data->needs_redraw = false;
 	init_textures(&data->texrgbinfo);
 	init_player(&data->player);
+	data->texture_pixels = NULL;
 }

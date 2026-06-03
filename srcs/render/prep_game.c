@@ -51,7 +51,9 @@ static void	prep_direction_we(t_player *player)
 void	prep_game(t_data *data)
 {
 	t_player	*player;
+	int			i;
 
+	i = -1;
 	player = &data->player;
 	player->pos_x = (double)player->x + 0.5;
 	player->pos_y = (double)player->y + 0.5;
@@ -61,6 +63,9 @@ void	prep_game(t_data *data)
 	data->texrgbinfo.tex[SOUTH] = mlx_load_png(data->texrgbinfo.south);
 	data->texrgbinfo.tex[WEST] = mlx_load_png(data->texrgbinfo.west);
 	data->texrgbinfo.tex[EAST] = mlx_load_png(data->texrgbinfo.east);
+	data->texture_pixels = ft_calloc(data->win_width, sizeof(uint32_t*));
+	while (++i < data->win_width)
+		data->texture_pixels[i] = ft_calloc(data->win_height, sizeof(uint32_t));
 }
 
 void	setup_jump_algo(t_ray *ray, t_player *player)
