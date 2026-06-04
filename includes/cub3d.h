@@ -35,7 +35,13 @@
 # define EAST 2
 # define WEST 3
 
-# define MOVE_SPEED 2
+# define FORWARD 0
+# define BACKWARD 1
+# define LEFT 2
+# define RIGHT 3
+
+# define MOVE_SPEED 1
+# define ROT_SPEED 0.5
 
 // ERROR MESSAGES //
 # define USAGE "Usage: ./cub3d <path/to/map.cub>"
@@ -161,6 +167,7 @@ typedef struct s_data
 	t_player		player;
 	t_texrgbinfo	texrgbinfo;
 	t_ray			ray;
+	uint32_t		color;
 }	t_data;
 
 void	init_data(t_data *data);
@@ -204,7 +211,7 @@ void	loop_hook(void *param);
 int		print_err_msg(char *msg);
 void	ft_error(t_data *data, int exit_code);
 int		free_data(t_data *data);
-void	free_tab(char **tab);
+void	free_tab(void **tab);
 
 // PREPARE GAME //
 void	setup_jump_algo(t_ray *ray, t_player *player);

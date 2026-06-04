@@ -111,17 +111,17 @@ static int	check_rgb_to_hex(char *char_colour, uint32_t *hex_colour)
 		i++;
 	if (i != 3)
 	{
-		free_tab(array);
+		free_tab((void **)array);
 		return (print_err_msg(INVALID_COUNT_RGB));
 	}
 	i = 0;
 	if (convert_n_check(array, rgb))
 	{
-		free_tab(array);
+		free_tab((void **)array);
 		return (1);
 	}
-	free_tab(array);
-	*hex_colour = (rgb[0] << 24) | (rgb[1] << 16) | (rgb[1] << 16) | (0xFF);
+	free_tab((void **)array);
+	*hex_colour = (rgb[0] << 24) | (rgb[1] << 16) | (rgb[2] << 8) | (0xFF);
 	return (0);
 }
 

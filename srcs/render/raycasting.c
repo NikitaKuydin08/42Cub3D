@@ -30,11 +30,18 @@ static void	recognise_side_tex(t_texrgbinfo *texinfo, t_ray *ray)
 	}
 }
 
+static void	makeup_color(t_data *data, mlx_texture_t *current_tex, int y, int x)
+{
+	uint8_t		*px;
+
+	px = &current_tex->pixels[(current_tex->width * y + x) * 4];
+	data->color = (px[0] << 24) | (px[1] << 16) | (px[2] << 8) | (px[3]);
+}
+
 static void	draw_texture(t_ray *ray, t_data *data, t_texrgbinfo *t, int x)
 {
 	int	y;
-	uint32_t	color;
-	int			texHeight;
+	int	texHeight;
 
 	recognise_side_tex(t, ray);
 	texHeight = t->tex[t->index]->height;
@@ -50,11 +57,11 @@ static void	draw_texture(t_ray *ray, t_data *data, t_texrgbinfo *t, int x)
 	{
 		t->line.y = (int)t->line.pos & (texHeight - 1);
 		t->line.pos += t->line.step;
-		color = (uint32_t)t->tex[t->index]->pixels[texHeight * t->line.y + t->line.x];
-		if (ray->side == 1)
-			color = (color >> 1) & 8355711;
-		if (color > 0)
-			data->texture_pixels[x][y] = color;
+		makeup_color(data, t->tex[t->index], t->line.y, t->line.x);
+		// if (ray->side == 1)
+		// 	data->color = (data->color >> 1) & 8355711;
+		if (data->color > 0)
+			data->texture_pixels[x][y] = data->color;
 		y++;
 	}
 }
@@ -104,9 +111,9 @@ static void	do_dda(t_ray *ray, t_data *data)
 
 void	raycasting(t_player *player, t_data *data)
 {
-    t_ray   ray;
-    int	x;
-	int	y;
+    t_ray	ray;
+    int		x;
+	int		y;
 
     ray = data->ray;
 	x = 0;

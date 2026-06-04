@@ -65,11 +65,9 @@ void	start_game(t_data *data)
 		ft_putstr_fd("data: Error: mlx: Could not initialize mlx", 2);
 		ft_error(data, 1);
 	}
-	// printf("Player pos: x=%.2f, y=%.2f\n", data->player.pos_x, data->player.pos_y);
-	// printf("Map dimensions: width=%d, height=%d\n", );
 	draw_game(data, &data->player);
-	// mlx_key_hook(data->mlx, key_hook, data);
-	// mlx_loop_hook(data->mlx, loop_hook, data);
+	mlx_key_hook(data->mlx, key_hook, data);
+	mlx_loop_hook(data->mlx, loop_hook, data);
 	mlx_loop(data->mlx);
 	mlx_terminate(data->mlx);
 	free(data);
@@ -104,7 +102,7 @@ int	main(int argc, char **argv)
 	init_data(data);
 	if (parsing(data, argv) != 0)
 		return (0);
-	print_map(data);
+	// print_map(data);
 	start_game(data);
 	return (0);
 }

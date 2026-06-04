@@ -70,7 +70,7 @@ void	prep_game(t_data *data)
 
 void	setup_jump_algo(t_ray *ray, t_player *player)
 {
-	if (player->dir_x > 0)
+	if (ray->ray_x > 0)
 	{
 		ray->stepX = 1;
 		ray->sideDistX = (ray->map_x + 1.0 - player->pos_x) * ray->deltaDistX;
@@ -80,7 +80,7 @@ void	setup_jump_algo(t_ray *ray, t_player *player)
 		ray->stepX = -1;
 		ray->sideDistX = (player->pos_x - ray->map_x) * ray->deltaDistX;
 	}
-	if (player->dir_y > 0)
+	if (ray->ray_y > 0)
 	{
 		ray->stepY = 1;
 		ray->sideDistY = (ray->map_y + 1.0 - player->pos_y) * ray->deltaDistY;

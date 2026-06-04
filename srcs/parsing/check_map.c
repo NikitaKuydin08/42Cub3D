@@ -56,6 +56,7 @@ static int	check_cell(t_data *data, char **map, int i, int j)
 		if (data->player.orientation != '0')
 			return (print_err_msg(MULTIPLE_PLAYER));
 		data->player.orientation = map[i][j];
+		map[i][j] = '0';
 		data->player.x = j;
 		data->player.y = i;
 	}

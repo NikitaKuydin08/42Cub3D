@@ -54,7 +54,7 @@ int	check_closure(t_data *data, char **map)
 		{
 			if (ft_strchr("0NSEW", map[i][j])
 				&& check_neighbor(data, i, j))
-				return (1);
+				return (0);
 			j++;
 		}
 		i++;

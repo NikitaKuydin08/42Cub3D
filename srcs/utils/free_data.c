@@ -12,7 +12,7 @@
 
 #include "../includes/cub3d.h"
 
-void	free_tab(char **tab)
+void	free_tab(void **tab)
 {
 	int	i;
 
@@ -32,9 +32,9 @@ void	free_tab(char **tab)
 void	free_map(t_data *data)
 {
 	if (data->map)
-		free_tab(data->map);
+		free_tab((void **)data->map);
 	if (data->file)
-		free_tab(data->file);
+		free_tab((void **)data->file);
 	if (data->fd > 0)
 		close(data->fd);
 	if (data->row_lengths)
@@ -43,6 +43,9 @@ void	free_map(t_data *data)
 
 void	free_texinfo(t_texrgbinfo *textures)
 {
+	int	i;
+
+	i = -1;
 	if (textures->north)
 		free(textures->north);
 	if (textures->south)
@@ -55,13 +58,15 @@ void	free_texinfo(t_texrgbinfo *textures)
 		free(textures->ceiling);
 	if (textures->floor)
 		free(textures->floor);
-	if (textures->tex)
-		free_tab(textures->tex);
+	while(textures->tex[++i])
+		free(textures->tex[i]);
 }
 
 int	free_data(t_data *data)
 {
 	free_map(data);
+	if (data->texture_pixels)
+		free_tab((void **)data->texture_pixels);
 	free_texinfo(&data->texrgbinfo);
 	free(data);
 	return (1);
