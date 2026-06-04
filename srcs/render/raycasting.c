@@ -91,11 +91,13 @@ static void	do_dda(t_ray *ray, t_data *data)
 		}
 		else
 		{
-			ray->sideDistY = ray->deltaDistY;
+			ray->sideDistY += ray->deltaDistY;
 			ray->map_y += ray->stepY;
 			ray->side = 1; // y grid
 		}
-		if (data->map[ray->map_x][ray->map_y] > '0')
+		if (!check_limit_dda(data, ray->map_x, ray->map_y))
+			break ;
+		if (data->map[ray->map_y][ray->map_x] > '0')
 			ray->hit = 1;
 	}
 }
@@ -104,14 +106,21 @@ void	raycasting(t_player *player, t_data *data)
 {
     t_ray   ray;
     int	x;
+	int	y;
 
     ray = data->ray;
 	x = 0;
 	while (x < data->win_width)
 	{
+		y = 0;
 		init_raycasting_dda(&ray, x, player);
 		do_dda(&ray, data);
 		distance_ray_to_wall(&ray, player, data);
+		while (y < ray.drawStart)
+			data->texture_pixels[x][y++] = data->texrgbinfo.hex_ceiling;
+		y = ray.drawEnd;
+		while (y < data->win_height)
+			data->texture_pixels[x][y++] = data->texrgbinfo.hex_floor;
 		draw_texture(&ray, data, &data->texrgbinfo, x);
 		x++;
 	}

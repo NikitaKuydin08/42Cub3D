@@ -11,3 +11,12 @@
 /* ************************************************************************** */
 
 #include "../includes/cub3d.h"
+
+int check_limit_dda(t_data *data, int x, int y)
+{
+    if (y < 0 || y >= data->row_count)
+        return (0);
+    if (x < 0 || x >= data->row_lengths[y])
+        return (0);
+    return (1);
+}

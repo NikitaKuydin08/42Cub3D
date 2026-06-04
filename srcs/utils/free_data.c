@@ -37,6 +37,8 @@ void	free_map(t_data *data)
 		free_tab(data->file);
 	if (data->fd > 0)
 		close(data->fd);
+	if (data->row_lengths)
+		free(data->row_lengths);
 }
 
 void	free_texinfo(t_texrgbinfo *textures)
@@ -53,6 +55,8 @@ void	free_texinfo(t_texrgbinfo *textures)
 		free(textures->ceiling);
 	if (textures->floor)
 		free(textures->floor);
+	if (textures->tex)
+		free_tab(textures->tex);
 }
 
 int	free_data(t_data *data)

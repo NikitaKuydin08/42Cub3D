@@ -32,6 +32,30 @@ void	print_map(t_data *data)
 	}
 }
 
+static int	init_row_lengths(t_data *data)
+{
+	int	i;
+	int	len;
+
+	i = 0;
+	data->row_lengths = ft_calloc(data->row_count, sizeof(int));
+	if (!data->row_lengths)
+		return (1);
+	while (i < data->row_count)
+	{
+		if (!data->map[i])
+			return (1);
+		len = ft_strlen(data->map[i]);
+		if (len > 0 && (data->map[i][len - 1] == '\n'))
+			len--;
+		while (len > 0 && (data->map[i][len - 1] == ' '))
+			len--;
+		data->row_lengths[i] = len;
+		i++;
+	}
+	return (0);
+}
+
 void	start_game(t_data *data)
 {
 	prep_game(data);
@@ -41,7 +65,7 @@ void	start_game(t_data *data)
 		ft_putstr_fd("data: Error: mlx: Could not initialize mlx", 2);
 		ft_error(data, 1);
 	}
-	printf("Player pos: x=%.2f, y=%.2f\n", data->player.pos_x, data->player.pos_y);
+	// printf("Player pos: x=%.2f, y=%.2f\n", data->player.pos_x, data->player.pos_y);
 	// printf("Map dimensions: width=%d, height=%d\n", );
 	draw_game(data, &data->player);
 	// mlx_key_hook(data->mlx, key_hook, data);
@@ -62,6 +86,8 @@ int	parsing(t_data *data, char **argv)
 	if (check_textures(&data->texrgbinfo))
 		return (free_data(data));
 	if (check_map(data))
+		return (free_data(data));
+	if (init_row_lengths(data))
 		return (free_data(data));
 	return (0);
 }

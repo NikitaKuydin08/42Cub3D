@@ -90,6 +90,7 @@ void	init_data(t_data *data)
 	data->map_idx = 0;
 	data->map_line = 0;
 	data->map_started = false;
+	data->row_lengths = NULL;
 	data->row_count = 0;
 	data->needs_redraw = false;
 	init_textures(&data->texrgbinfo);

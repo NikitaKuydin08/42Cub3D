@@ -30,31 +30,31 @@ static void	draw_image(t_data *data)
 	}
 }
 
-static void	draw_floor_n_ceiling(t_data *data)
-{
-	uint32_t	x;
-	uint32_t	y;
-	uint32_t	mid;
+// static void	draw_floor_n_ceiling(t_data *data)
+// {
+// 	uint32_t	x;
+// 	uint32_t	y;
+// 	uint32_t	mid;
 
-	mid = data->win_height / 2;
-	(void)mid;
-	y = 0;
-	while (y < (uint32_t)data->win_height)
-	{
-		x = 0;
-		while (x < (uint32_t)data->win_width)
-		{
-			if (y < mid)
-				mlx_put_pixel(data->image, x, y,
-					data->texrgbinfo.hex_ceiling);
-			else
-				mlx_put_pixel(data->image, x, y,
-					data->texrgbinfo.hex_floor);
-			x++;
-		}
-		y++;
-	}
-}
+// 	mid = data->win_height / 2;
+// 	(void)mid;
+// 	y = 0;
+// 	while (y < (uint32_t)data->win_height)
+// 	{
+// 		x = 0;
+// 		while (x < (uint32_t)data->win_width)
+// 		{
+// 			if (y < mid)
+// 				mlx_put_pixel(data->image, x, y,
+// 					data->texrgbinfo.hex_ceiling);
+// 			else
+// 				mlx_put_pixel(data->image, x, y,
+// 					data->texrgbinfo.hex_floor);
+// 			x++;
+// 		}
+// 		y++;
+// 	}
+// }
 
 void	draw_game(t_data *data, t_player *player)
 {
@@ -66,9 +66,9 @@ void	draw_game(t_data *data, t_player *player)
 			image buffer", 2);
 		ft_error(data, 1);
 	}
-	draw_floor_n_ceiling(data);
 	raycasting(player, data);
 	draw_image(data);
+	// draw_floor_n_ceiling(data);
 	if (mlx_image_to_window(data->mlx, data->image, 0, 0) < 0)
 	{
 		ft_putstr_fd("data: Error: mlx: Could not draw a new image", 2);

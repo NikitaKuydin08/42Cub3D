@@ -22,6 +22,11 @@
 //	MLX_KEY_DOWN			= 264,
 //	MLX_KEY_UP				= 265,
 
+// static void	ft_move(t_data *data, int key)
+// {
+
+// }
+
 // void	key_hook(mlx_key_data_t keydata, void *param)
 // {
 // 	t_data	*data;

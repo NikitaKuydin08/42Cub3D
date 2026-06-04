@@ -132,7 +132,9 @@ typedef struct s_player
 	double	plane_y;
 	int		move_speed;
 	int		rot_speed;
-
+	int		move_x;
+	int		move_y;
+	int		rotate;
 }	t_player;
 
 typedef struct s_data
@@ -152,6 +154,7 @@ typedef struct s_data
 	int				map_line;
 	bool			map_started;
 	int				row_count;
+	int				*row_lengths;
 
 	bool			needs_redraw;
 	int				**texture_pixels;
@@ -209,6 +212,9 @@ void	setup_jump_algo(t_ray *ray, t_player *player);
 // MOVING AND KEYS IMPLEMENTATION //
 void	loop_hook(void *param);
 void	key_hook(mlx_key_data_t keydata, void *param);
+
+// UTILS //
+int check_limit_dda(t_data *data, int x, int y);
 
 
 #endif
