@@ -2,7 +2,7 @@
 NAME = cub3D
 
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -g
+CFLAGS = -Wall -Wextra -Werror -g -fsanitize=address
 MLX_DIR = ./MLX42
 LIBFT_DIR = ./libft
 OBJ_DIR = objects/

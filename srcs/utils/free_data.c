@@ -6,7 +6,7 @@
 /*   By: nkuydin <nkuydin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/08 10:34:37 by Nikita_Kuyd       #+#    #+#             */
-/*   Updated: 2026/06/05 23:34:22 by nkuydin          ###   ########.fr       */
+/*   Updated: 2026/06/05 23:50:18 by nkuydin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,8 +37,7 @@ void	free_map(t_data *data)
 		free_tab((void **)data->file);
 	if (data->fd > 0)
 		close(data->fd);
-	if (data->path)
-		free(data->path);
+	data->path = NULL;
 	if (data->row_lengths)
 		free(data->row_lengths);
 }
@@ -60,8 +59,11 @@ void	free_texinfo(t_texrgbinfo *textures)
 		free(textures->ceiling);
 	if (textures->floor)
 		free(textures->floor);
-	while (textures->tex[++i])
-		mlx_delete_texture(textures->tex[i]);
+	while (++i < 4)
+	{
+		if (textures->tex[i])
+			mlx_delete_texture(textures->tex[i]);
+	}
 }
 
 void	free_texture_pixels(t_data *data)
@@ -90,11 +92,11 @@ int	free_data(t_data *data)
 		data->image = NULL;
 		data->delete = true;
 	}
-	// if (data->mlx && !data->close)
-	// {
-	// 	mlx_close_window(data->mlx);
-	// 	data->close = true;
-	// }
+	if (data->mlx && !data->close)
+	{
+		mlx_close_window(data->mlx);
+		data->close = true;
+	}
 	if (data->mlx && !data->terminate)
 	{
 		mlx_terminate(data->mlx);
