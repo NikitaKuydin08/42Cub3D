@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   init.c                                             :+:      :+:    :+:   */
+/*   init_data.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: Nikita_Kuydin <nikitakuydin@qmail.com>     #+#  +:+       +#+        */
+/*   By: nkuydin <nkuydin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026-04-24 10:04:16 by Nikita_Kuydin     #+#    #+#             */
-/*   Updated: 2026-04-24 10:04:16 by Nikita_Kuydin    ###   ########.fr       */
+/*   Created: 2026/04/24 10:04:16 by Nikita_Kuyd       #+#    #+#             */
+/*   Updated: 2026/06/05 23:16:30 by nkuydin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,35 +44,35 @@ void	init_player(t_player *player)
 
 void	init_ray(t_ray *ray)
 {
-	ray->cameraX = 0;
+	ray->camera_x = 0;
 	ray->ray_x = 0.0;
 	ray->ray_y = 0.0;
 	ray->map_x = 0;
 	ray->map_y = 0;
-	ray->sideDistX = 0.0;
-	ray->sideDistY = 0.0;
-	ray->deltaDistX = 0.0;
-	ray->deltaDistY = 0.0;
-	ray->stepX = 0;
-	ray->stepY = 0;
+	ray->sidedist_x = 0.0;
+	ray->sidedist_y = 0.0;
+	ray->deltadist_x = 0.0;
+	ray->deltadist_y = 0.0;
+	ray->step_x = 0;
+	ray->step_y = 0;
 	ray->hit = 0;
-	ray->DistWall = 0.0;
-	ray->drawEnd = 0;
-	ray->drawStart = 0;
-	ray->lineHeight = 0;
+	ray->distwall = 0.0;
+	ray->draw_end = 0;
+	ray->draw_start = 0;
+	ray->line_height = 0;
 	ray->pos_on_wall = 0.0;
 }
 
 void	init_raycasting_dda(t_ray *ray, int x, t_player *player)
 {
 	init_ray(ray);
-	ray->cameraX = (2 * x) / (double)WIN_WIDTH - 1;
-	ray->ray_x = player->dir_x + player->plane_x * ray->cameraX;
-	ray->ray_y = player->dir_y + player->plane_y * ray->cameraX;
+	ray->camera_x = (2 * x) / (double)WIN_WIDTH - 1;
+	ray->ray_x = player->dir_x + player->plane_x * ray->camera_x;
+	ray->ray_y = player->dir_y + player->plane_y * ray->camera_x;
 	ray->map_x = (int)player->pos_x;
 	ray->map_y = (int)player->pos_y;
-	ray->deltaDistX = fabs(1 / ray->ray_x);
-	ray->deltaDistY = fabs(1 / ray->ray_y);
+	ray->deltadist_x = fabs(1 / ray->ray_x);
+	ray->deltadist_y = fabs(1 / ray->ray_y);
 	setup_jump_algo(ray, player);
 }
 
@@ -96,4 +96,7 @@ void	init_data(t_data *data)
 	init_textures(&data->texrgbinfo);
 	init_player(&data->player);
 	data->texture_pixels = NULL;
+	data->delete = false;
+	data->close = false;
+	data->terminate = false;
 }

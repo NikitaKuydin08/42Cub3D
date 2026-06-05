@@ -133,27 +133,27 @@ R = [cos θ  -sin θ]; [sin θ   cos θ]. Rotates points in the xy plan counterc
 
 ![alt text](image-3.png)
 
-deltaDistX and deltaDistY are the distance the ray has to travel to go from 1 x-side to the next x-side, or from 1 y-side to the next y-side. Alright so delta here, is just the difference(length) between intersection of the line with one x-grid and the next one.
+deltadist_x and deltadist_y are the distance the ray has to travel to go from 1 x-side to the next x-side, or from 1 y-side to the next y-side. Alright so delta here, is just the difference(length) between intersection of the line with one x-grid and the next one.
 
-- deltaDistX = sqrt[(x2 - x1)^2 + (y2 - y1)^2];
-- deltaDistY = 1;
+- deltadist_x = sqrt[(x2 - x1)^2 + (y2 - y1)^2];
+- deltadist_y = 1;
 - We want to know: how far does the ray travel to cross 1 unit in X. So (x2-x1) = 1:
-- SO, deltaDistX = sqrt(1 + (y2 - y1)^2);
+- SO, deltadist_x = sqrt(1 + (y2 - y1)^2);
 Now, slope of the line is (y2 - y1)/(x2 - x1). Since (x2-x1) = 1; slope = (y2 - y1)
-- SO, deltadistX = sqrt(1 + (rayDirY / rayDirX)^2);
-- OR, deltaDistX = sqrt(1 + (rayDirY^2 / rayDirX^2));
-- deltaDistX = sqrt(rayDirX^2 / rayDirX^2 + rayDirY^2 / rayDirX^2);
-- deltaDistX = sqrt((rayDirX^2 + rayDirY^2) / rayDirX^2);
-- deltaDistX = sqrt(rayDirX^2 + rayDirY^2) / sqrt(rayDirX^2)
-- deltadistX = sqrt(rayDirX^2 + rayDirY^2) / abs(rayDirX)
-- deltaDistX = abs(1 / rayDirX)
-- deltaDistY = abs(1 / rayDirY)
+- SO, deltadist_x = sqrt(1 + (rayDirY / rayDirX)^2);
+- OR, deltadist_x = sqrt(1 + (rayDirY^2 / rayDirX^2));
+- deltadist_x = sqrt(rayDirX^2 / rayDirX^2 + rayDirY^2 / rayDirX^2);
+- deltadist_x = sqrt((rayDirX^2 + rayDirY^2) / rayDirX^2);
+- deltadist_x = sqrt(rayDirX^2 + rayDirY^2) / sqrt(rayDirX^2)
+- deltadist_x = sqrt(rayDirX^2 + rayDirY^2) / abs(rayDirX)
+- deltadist_x = abs(1 / rayDirX)
+- deltadist_y = abs(1 / rayDirY)
 
  - mapX + 1.0 - posX → "How far until I reach the next vertical grid line?"
- - deltaDistX → "How much ray length corresponds to 1 unit of X movement?"
- - sideDistX → "How far along the ray until I hit that vertical grid line?"
+ - deltadist_x → "How much ray length corresponds to 1 unit of X movement?"
+ - sidedist_x → "How far along the ray until I hit that vertical grid line?"
 
- if sideDistX smaller/lower than sideDistY
+ if sidedist_x smaller/lower than sidedist_y
 	we take one step/one unit in the x direction, to the x side/grid line
  else
 	we take one step in the y direction, to the y side
@@ -170,3 +170,6 @@ ray->wall_x  is the point in the y axes or x axes depending on the value of the 
 - [Someone's Cub3D Explanation](https://hackmd.io/@nszl/H1LXByIE2#Map-parsing-and-validating)
 - [RayCasting Crazy Explanation in Russian Language](https://www.youtube.com/watch?v=XWCHl0rpBj4)
 - [The Best Explanation for people who love visualise](https://www.youtube.com/watch?v=eOCQfxRQ2pY)
+
+## AI Usage
+- AI was used to create a beatiful header file, showing controls and the name of the project

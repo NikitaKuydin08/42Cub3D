@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   free_data.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: Nikita_Kuydin <nikitakuydin@qmail.com>     #+#  +:+       +#+        */
+/*   By: nkuydin <nkuydin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026-05-08 10:34:37 by Nikita_Kuydin     #+#    #+#             */
-/*   Updated: 2026-05-08 10:34:37 by Nikita_Kuydin    ###   ########.fr       */
+/*   Created: 2026/05/08 10:34:37 by Nikita_Kuyd       #+#    #+#             */
+/*   Updated: 2026/06/05 23:34:22 by nkuydin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,8 @@ void	free_map(t_data *data)
 		free_tab((void **)data->file);
 	if (data->fd > 0)
 		close(data->fd);
+	if (data->path)
+		free(data->path);
 	if (data->row_lengths)
 		free(data->row_lengths);
 }
@@ -58,16 +60,50 @@ void	free_texinfo(t_texrgbinfo *textures)
 		free(textures->ceiling);
 	if (textures->floor)
 		free(textures->floor);
-	while(textures->tex[++i])
-		free(textures->tex[i]);
+	while (textures->tex[++i])
+		mlx_delete_texture(textures->tex[i]);
+}
+
+void	free_texture_pixels(t_data *data)
+{
+	int	i;
+
+	i = 0;
+	if (!data->texture_pixels)
+		return ;
+	while (i < data->win_width)
+	{
+		free(data->texture_pixels[i]);
+		i++;
+	}
+	free(data->texture_pixels);
+	data->texture_pixels = NULL;
 }
 
 int	free_data(t_data *data)
 {
+	if (!data)
+		return (1);
+	if (data->image && data->mlx && !data->delete)
+	{
+		mlx_delete_image(data->mlx, data->image);
+		data->image = NULL;
+		data->delete = true;
+	}
+	// if (data->mlx && !data->close)
+	// {
+	// 	mlx_close_window(data->mlx);
+	// 	data->close = true;
+	// }
+	if (data->mlx && !data->terminate)
+	{
+		mlx_terminate(data->mlx);
+		data->mlx = NULL;
+		data->terminate = true;
+	}
 	free_map(data);
-	if (data->texture_pixels)
-		free_tab((void **)data->texture_pixels);
 	free_texinfo(&data->texrgbinfo);
+	free_texture_pixels(data);
 	free(data);
 	return (1);
 }

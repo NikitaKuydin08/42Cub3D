@@ -3,32 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   raycasting.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: Nikita_Kuydin <nikitakuydin@qmail.com>     #+#  +:+       +#+        */
+/*   By: nkuydin <nkuydin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026-05-16 08:14:56 by Nikita_Kuydin     #+#    #+#             */
-/*   Updated: 2026-05-16 08:14:56 by Nikita_Kuydin    ###   ########.fr       */
+/*   Created: 2026/05/16 08:14:56 by Nikita_Kuyd       #+#    #+#             */
+/*   Updated: 2026/06/05 17:13:12 by nkuydin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/cub3d.h"
-
-static void	recognise_side_tex(t_texrgbinfo *texinfo, t_ray *ray)
-{
-	if (ray->side == 0)
-	{
-		if (ray->ray_x < 0)
-			texinfo->index = WEST;
-		else
-			texinfo->index = EAST;
-	}
-	else
-	{
-		if (ray->ray_y < 0)
-			texinfo->index = NORTH;
-		else
-			texinfo->index = SOUTH;
-	}
-}
 
 static void	makeup_color(t_data *data, mlx_texture_t *current_tex, int y, int x)
 {
@@ -41,25 +23,23 @@ static void	makeup_color(t_data *data, mlx_texture_t *current_tex, int y, int x)
 static void	draw_texture(t_ray *ray, t_data *data, t_texrgbinfo *t, int x)
 {
 	int	y;
-	int	texHeight;
+	int	tex_height;
 
 	recognise_side_tex(t, ray);
-	texHeight = t->tex[t->index]->height;
+	tex_height = t->tex[t->index]->height;
 	t->line.x = (int)(ray->pos_on_wall * t->tex[t->index]->width);
 	if ((ray->side == 0 && ray->ray_x > 0)
 		|| (ray->side == 1 && ray->ray_y < 0))
 		t->line.x = t->tex[t->index]->width - t->line.x - 1;
-	t->line.step = 1.0 * texHeight / ray->lineHeight;
-	t->line.pos = (ray->drawStart - data->win_height / 2 + ray->lineHeight
-		/ 2) * t->line.step;
-	y = ray->drawStart;
-	while (y < ray->drawEnd)
+	t->line.step = 1.0 * tex_height / ray->line_height;
+	t->line.pos = (ray->draw_start - data->win_height / 2 + ray->line_height
+			/ 2) * t->line.step;
+	y = ray->draw_start;
+	while (y < ray->draw_end)
 	{
-		t->line.y = (int)t->line.pos & (texHeight - 1);
+		t->line.y = (int)t->line.pos & (tex_height - 1);
 		t->line.pos += t->line.step;
 		makeup_color(data, t->tex[t->index], t->line.y, t->line.x);
-		// if (ray->side == 1)
-		// 	data->color = (data->color >> 1) & 8355711;
 		if (data->color > 0)
 			data->texture_pixels[x][y] = data->color;
 		y++;
@@ -69,24 +49,24 @@ static void	draw_texture(t_ray *ray, t_data *data, t_texrgbinfo *t, int x)
 static void	distance_ray_to_wall(t_ray *ray, t_player *player, t_data *data)
 {
 	if (ray->side == 0)
-		ray->DistWall = ray->sideDistX - ray->deltaDistX;
+		ray->distwall = ray->sidedist_x - ray->deltadist_x;
 	else
-		ray->DistWall = ray->sideDistY - ray->deltaDistY;
-	if (ray->DistWall < 0.0001)
-		ray->DistWall = 0.0001;
-	ray->lineHeight = (int)(data->win_height / ray->DistWall);
-	if (ray->lineHeight < 0)
-		ray->lineHeight = 0;
-	ray->drawStart = (data->win_height / 2) - (ray->lineHeight / 2);
-	if (ray->drawStart < 0)
-		ray->drawStart = 0;
-	ray->drawEnd = (data->win_height / 2) + (ray->lineHeight / 2);
-	if (ray->drawEnd >= data->win_height)
-		ray->drawEnd = data->win_height - 1;
+		ray->distwall = ray->sidedist_y - ray->deltadist_y;
+	if (ray->distwall < 0.0001)
+		ray->distwall = 0.0001;
+	ray->line_height = (int)(data->win_height / ray->distwall);
+	if (ray->line_height < 0)
+		ray->line_height = 0;
+	ray->draw_start = (data->win_height / 2) - (ray->line_height / 2);
+	if (ray->draw_start < 0)
+		ray->draw_start = 0;
+	ray->draw_end = (data->win_height / 2) + (ray->line_height / 2);
+	if (ray->draw_end >= data->win_height)
+		ray->draw_end = data->win_height - 1;
 	if (ray->side == 0)
-		ray->pos_on_wall = player->pos_y + ray->DistWall * ray->ray_y;
+		ray->pos_on_wall = player->pos_y + ray->distwall * ray->ray_y;
 	else
-		ray->pos_on_wall = player->pos_x + ray->DistWall * ray->ray_x;
+		ray->pos_on_wall = player->pos_x + ray->distwall * ray->ray_x;
 	ray->pos_on_wall -= floor(ray->pos_on_wall);
 }
 
@@ -94,16 +74,16 @@ static void	do_dda(t_ray *ray, t_data *data)
 {
 	while (ray->hit == 0)
 	{
-		if (ray->sideDistX < ray->sideDistY)
+		if (ray->sidedist_x < ray->sidedist_y)
 		{
-			ray->sideDistX += ray->deltaDistX;
-			ray->map_x += ray->stepX;
+			ray->sidedist_x += ray->deltadist_x;
+			ray->map_x += ray->step_x;
 			ray->side = 0; // x grid
 		}
 		else
 		{
-			ray->sideDistY += ray->deltaDistY;
-			ray->map_y += ray->stepY;
+			ray->sidedist_y += ray->deltadist_y;
+			ray->map_y += ray->step_y;
 			ray->side = 1; // y grid
 		}
 		if (!check_limit_dda(data, ray->map_x, ray->map_y))
@@ -115,11 +95,11 @@ static void	do_dda(t_ray *ray, t_data *data)
 
 void	raycasting(t_player *player, t_data *data)
 {
-    t_ray	ray;
-    int		x;
+	t_ray	ray;
+	int		x;
 	int		y;
 
-    ray = data->ray;
+	ray = data->ray;
 	x = 0;
 	while (x < data->win_width)
 	{
@@ -127,9 +107,9 @@ void	raycasting(t_player *player, t_data *data)
 		init_raycasting_dda(&ray, x, player);
 		do_dda(&ray, data);
 		distance_ray_to_wall(&ray, player, data);
-		while (y < ray.drawStart)
+		while (y < ray.draw_start)
 			data->texture_pixels[x][y++] = data->texrgbinfo.hex_ceiling;
-		y = ray.drawEnd;
+		y = ray.draw_end;
 		while (y < data->win_height)
 			data->texture_pixels[x][y++] = data->texrgbinfo.hex_floor;
 		draw_texture(&ray, data, &data->texrgbinfo, x);
