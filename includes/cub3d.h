@@ -41,7 +41,8 @@
 # define RIGHT 3
 
 # define MOVE_SPEED 1
-# define ROT_SPEED 0.5
+# define ROT_RIGHT 0.25
+# define ROT_LEFT -0.25
 
 // ERROR MESSAGES //
 # define USAGE "Usage: ./cub3d <path/to/map.cub>"

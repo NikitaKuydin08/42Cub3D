@@ -72,12 +72,26 @@ static void	ft_move(t_data *data, int key)
 	validate_move(data, new_x, new_y);
 }
 
-static void	ft_rotate(t_data *data, double rot_speed)
+static void	ft_rotate(t_data *data, double rot_key)
 {
 	double	oldDir_x;
+	double	oldPlaneX;
+	double	rot_speed;
 
+	if (rot_key == ROT_LEFT)
+		rot_speed = ROT_LEFT;
+	else
+		rot_speed = ROT_RIGHT;
 	oldDir_x = data->player.dir_x;
-	
+	data->player.dir_x = data->player.dir_x * cos(rot_speed)
+		- data->player.dir_y * sin(rot_speed);
+	data->player.dir_y = oldDir_x * sin(rot_speed)
+		+ data->player.dir_y * cos(rot_speed);
+	oldPlaneX = data->player.plane_x;
+	data->player.plane_x = data->player.plane_x * cos(rot_speed)
+		- data->player.plane_y * sin(rot_speed);
+	data->player.plane_y = oldPlaneX * sin(rot_speed)
+		+ data->player.plane_y * cos(rot_speed);
 }
 
 void	key_hook(mlx_key_data_t keydata, void *param)
@@ -96,9 +110,9 @@ void	key_hook(mlx_key_data_t keydata, void *param)
 	else if (keydata.key == 68)
 		ft_move(data, RIGHT);
 	else if (keydata.key == MLX_KEY_LEFT)
-		ft_rotate(data, -ROT_SPEED);
+		ft_rotate(data, ROT_LEFT);
 	else if (keydata.key == MLX_KEY_RIGHT)
-		ft_rotate(data, ROT_SPEED);
+		ft_rotate(data, ROT_RIGHT);
 	data->needs_redraw = true;
 }
 
