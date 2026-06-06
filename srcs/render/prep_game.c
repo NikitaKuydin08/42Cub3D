@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   prep_player.c                                      :+:      :+:    :+:   */
+/*   prep_game.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: Nikita_Kuydin <nikitakuydin@qmail.com>     #+#  +:+       +#+        */
+/*   By: nkuydin <nkuydin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026-05-15 04:06:50 by Nikita_Kuydin     #+#    #+#             */
-/*   Updated: 2026-05-15 04:06:50 by Nikita_Kuydin    ###   ########.fr       */
+/*   Created: 2026/05/15 04:06:50 by Nikita_Kuyd       #+#    #+#             */
+/*   Updated: 2026/06/05 17:13:39 by nkuydin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ void	prep_game(t_data *data)
 	data->texrgbinfo.tex[SOUTH] = mlx_load_png(data->texrgbinfo.south);
 	data->texrgbinfo.tex[WEST] = mlx_load_png(data->texrgbinfo.west);
 	data->texrgbinfo.tex[EAST] = mlx_load_png(data->texrgbinfo.east);
-	data->texture_pixels = ft_calloc(data->win_width, sizeof(uint32_t*));
+	data->texture_pixels = ft_calloc(data->win_width, sizeof(uint32_t *));
 	while (++i < data->win_width)
 		data->texture_pixels[i] = ft_calloc(data->win_height, sizeof(uint32_t));
 }
@@ -72,22 +72,22 @@ void	setup_jump_algo(t_ray *ray, t_player *player)
 {
 	if (ray->ray_x > 0)
 	{
-		ray->stepX = 1;
-		ray->sideDistX = (ray->map_x + 1.0 - player->pos_x) * ray->deltaDistX;
+		ray->step_x = 1;
+		ray->sidedist_x = (ray->map_x + 1.0 - player->pos_x) * ray->deltadist_x;
 	}
 	else
 	{
-		ray->stepX = -1;
-		ray->sideDistX = (player->pos_x - ray->map_x) * ray->deltaDistX;
+		ray->step_x = -1;
+		ray->sidedist_x = (player->pos_x - ray->map_x) * ray->deltadist_x;
 	}
 	if (ray->ray_y > 0)
 	{
-		ray->stepY = 1;
-		ray->sideDistY = (ray->map_y + 1.0 - player->pos_y) * ray->deltaDistY;
+		ray->step_y = 1;
+		ray->sidedist_y = (ray->map_y + 1.0 - player->pos_y) * ray->deltadist_y;
 	}
 	else
 	{
-		ray->stepY = -1;
-		ray->sideDistY = (player->pos_y - ray->map_y) * ray->deltaDistY;
+		ray->step_y = -1;
+		ray->sidedist_y = (player->pos_y - ray->map_y) * ray->deltadist_y;
 	}
 }

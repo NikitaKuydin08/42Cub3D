@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cub3d.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: Nikita_Kuydin <nikitakuydin@qmail.com>     #+#  +:+       +#+        */
+/*   By: nkuydin <nkuydin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026-04-24 09:52:39 by Nikita_Kuydin     #+#    #+#             */
-/*   Updated: 2026-04-24 09:52:39 by Nikita_Kuydin    ###   ########.fr       */
+/*   Created: 2026/04/24 09:52:39 by Nikita_Kuyd       #+#    #+#             */
+/*   Updated: 2026/06/06 15:17:53 by nkuydin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 # include <string.h>
 # include <errno.h>
 # include <sys/stat.h>
+# include <sys/time.h>
 
 // VARIABLES //
 # define WIN_HEIGHT 800
@@ -43,6 +44,10 @@
 # define MOVE_SPEED 1
 # define ROT_RIGHT 0.25
 # define ROT_LEFT -0.25
+
+# ifndef BONUS
+#  define BONUS 1
+# endif
 
 // ERROR MESSAGES //
 # define USAGE "Usage: ./cub3d <path/to/map.cub>"
@@ -78,9 +83,14 @@ char (including signs)"
 # define NO_PLAYER "Map doesn't have player. Expected (N, S, E, or W)"
 # define TRAPPED_PLAYER "Map doesn't have cell (0) next to player's position"
 # define ERR_TAB "Tab character is not allowed in map, only spaces"
+// WIN_ERRORS //
+# define NOT_INIT "data: Error: mlx: Could not initialize mlx"
+# define NOT_INIT_IMG_BUF "data: Error: mlx: Could not allocate a new \
+			image buffer"
+# define CANT_CREATE_INSTANCE "data: Error: mlx: Could not draw a new image"
 
 // STRUCTURES //
-typedef struct	s_line
+typedef struct s_line
 {
 	int		x;
 	int		y;
@@ -106,23 +116,23 @@ typedef struct s_texrgbinfo
 
 typedef struct s_ray
 {
-	double	cameraX;
+	double	camera_x;
 	double	ray_x;
 	double	ray_y;
 	int		map_x;
 	int		map_y;
-	double	sideDistX;
-	double	sideDistY;
-	double	deltaDistX;
-	double	deltaDistY;
-	int		stepX;
-	int		stepY;
+	double	sidedist_x;
+	double	sidedist_y;
+	double	deltadist_x;
+	double	deltadist_y;
+	int		step_x;
+	int		step_y;
 	int		hit;
 	int		side;
-	double	DistWall;
-	int		drawStart;
-	int		drawEnd;
-	int		lineHeight;
+	double	distwall;
+	int		draw_start;
+	int		draw_end;
+	int		line_height;
 	double	pos_on_wall;
 }	t_ray;
 
@@ -137,11 +147,6 @@ typedef struct s_player
 	double	dir_y;
 	double	plane_x;
 	double	plane_y;
-	int		move_speed;
-	int		rot_speed;
-	int		move_x;
-	int		move_y;
-	int		rotate;
 }	t_player;
 
 typedef struct s_data
@@ -169,10 +174,15 @@ typedef struct s_data
 	t_texrgbinfo	texrgbinfo;
 	t_ray			ray;
 	uint32_t		color;
+	bool			terminate;
+	bool			delete;
+	bool			close;
 }	t_data;
 
+void	header(void);
+
 void	init_data(t_data *data);
-void	init_raycasting_dda(t_ray *ray, int x, t_player *player);   
+void	init_raycasting_dda(t_ray *ray, int x, t_player *player);
 void	init_ray(t_ray *ray);
 
 // CHECK_MAP_CLOSURE //
@@ -210,7 +220,7 @@ void	loop_hook(void *param);
 
 // UTILS //
 int		print_err_msg(char *msg);
-void	ft_error(t_data *data, int exit_code);
+void	ft_error(t_data *data, int exit_code, char *msg);
 int		free_data(t_data *data);
 void	free_tab(void **tab);
 
@@ -222,7 +232,8 @@ void	loop_hook(void *param);
 void	key_hook(mlx_key_data_t keydata, void *param);
 
 // UTILS //
-int check_limit_dda(t_data *data, int x, int y);
-
+int		check_limit_dda(t_data *data, int x, int y);
+void	recognise_side_tex(t_texrgbinfo *texinfo, t_ray *ray);
+void	free_tab(void **tab);
 
 #endif

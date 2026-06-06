@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   moving_n_keys.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: Nikita_Kuydin <nikitakuydin@qmail.com>     #+#  +:+       +#+        */
+/*   By: nkuydin <nkuydin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026-05-15 14:41:55 by Nikita_Kuydin     #+#    #+#             */
-/*   Updated: 2026-05-15 14:41:55 by Nikita_Kuydin    ###   ########.fr       */
+/*   Created: 2026/05/15 14:41:55 by Nikita_Kuyd       #+#    #+#             */
+/*   Updated: 2026/06/06 15:08:18 by nkuydin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,18 +21,6 @@
 // 	MLX_KEY_RIGHT			= 262,
 //	MLX_KEY_DOWN			= 264,
 //	MLX_KEY_UP				= 265,
-
-static void	escape_game(t_data *data)
-{
-	if (!data)
-		exit(1);
-	if (data->image && data->mlx)
-		mlx_delete_image(data->mlx, data->image);
-	if (data->mlx)
-		mlx_close_window(data->mlx);
-	// free_data(data);
-	exit(1);
-}
 
 static void	validate_move(t_data *data, double new_x, double new_y)
 {
@@ -74,23 +62,23 @@ static void	ft_move(t_data *data, int key)
 
 static void	ft_rotate(t_data *data, double rot_key)
 {
-	double	oldDir_x;
-	double	oldPlaneX;
+	double	olddir_x;
+	double	oldplane_x;
 	double	rot_speed;
 
 	if (rot_key == ROT_LEFT)
 		rot_speed = ROT_LEFT;
 	else
 		rot_speed = ROT_RIGHT;
-	oldDir_x = data->player.dir_x;
+	olddir_x = data->player.dir_x;
 	data->player.dir_x = data->player.dir_x * cos(rot_speed)
 		- data->player.dir_y * sin(rot_speed);
-	data->player.dir_y = oldDir_x * sin(rot_speed)
+	data->player.dir_y = olddir_x * sin(rot_speed)
 		+ data->player.dir_y * cos(rot_speed);
-	oldPlaneX = data->player.plane_x;
+	oldplane_x = data->player.plane_x;
 	data->player.plane_x = data->player.plane_x * cos(rot_speed)
 		- data->player.plane_y * sin(rot_speed);
-	data->player.plane_y = oldPlaneX * sin(rot_speed)
+	data->player.plane_y = oldplane_x * sin(rot_speed)
 		+ data->player.plane_y * cos(rot_speed);
 }
 
@@ -100,7 +88,11 @@ void	key_hook(mlx_key_data_t keydata, void *param)
 
 	data = (t_data *)param;
 	if (keydata.key == 256 && keydata.action == 1)
-		escape_game(data);
+	{
+		if (data && data->mlx)
+			mlx_close_window(data->mlx);
+		return ;
+	}
 	else if (keydata.key == 87 || keydata.key == 265)
 		ft_move(data, FORWARD);
 	else if (keydata.key == 83 || keydata.key == 264)

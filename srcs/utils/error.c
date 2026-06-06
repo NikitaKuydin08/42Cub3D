@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   error.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: Nikita_Kuydin <nikitakuydin@qmail.com>     #+#  +:+       +#+        */
+/*   By: nkuydin <nkuydin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026-05-02 07:12:57 by Nikita_Kuydin     #+#    #+#             */
-/*   Updated: 2026-05-02 07:12:57 by Nikita_Kuydin    ###   ########.fr       */
+/*   Created: 2026/05/02 07:12:57 by Nikita_Kuyd       #+#    #+#             */
+/*   Updated: 2026/06/05 21:10:10 by nkuydin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,14 +20,12 @@ int	print_err_msg(char *msg)
 	return (1);
 }
 
-void	ft_error(t_data *data, int exit_code)
+void	ft_error(t_data *data, int exit_code, char *msg)
 {
+	if (msg)
+		ft_putstr_fd(msg, 2);
 	if (!data)
 		exit(exit_code);
-	if (data->image && data->mlx)
-		mlx_delete_image(data->mlx, data->image);
-	if (data->mlx)
-		mlx_close_window(data->mlx);
 	free_data(data);
 	exit(exit_code);
 }

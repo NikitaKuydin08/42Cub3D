@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   map_filling.c                                      :+:      :+:    :+:   */
+/*   map_copy.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: Nikita_Kuydin <nikitakuydin@qmail.com>     #+#  +:+       +#+        */
+/*   By: nkuydin <nkuydin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026-05-04 09:39:51 by Nikita_Kuydin     #+#    #+#             */
-/*   Updated: 2026-05-04 09:39:51 by Nikita_Kuydin    ###   ########.fr       */
+/*   Created: 2026/05/04 09:39:51 by Nikita_Kuyd       #+#    #+#             */
+/*   Updated: 2026/06/05 23:01:17 by nkuydin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,23 +27,6 @@
 	write the line into file[row], terminate with '\0';
 	read the next line.
 */
-
-static void	free_copy(char **copy)
-{
-	int	i;
-
-	i = 0;
-	while (copy[i])
-	{
-		free(copy[i]);
-		i++;
-	}
-	if (copy)
-	{
-		free(copy);
-		copy = NULL;
-	}
-}
 
 static int	count_lines(char *path)
 {
@@ -75,10 +58,10 @@ static int	copy_file(int row, int column, int i, t_data *data)
 	{
 		i = 0;
 		column = 0;
-		data->file[row] = ft_calloc(ft_strlen(line) + 1, sizeof(char *));
+		data->file[row] = ft_calloc(ft_strlen(line) + 1, sizeof(char));
 		if (!data->file[row])
 		{
-			free_copy(data->file);
+			free_tab((void **)data->file);
 			free(line);
 			return (print_err_msg(ERR_MALLOC));
 		}

@@ -3,34 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: Nikita_Kuydin <nikitakuydin@qmail.com>     #+#  +:+       +#+        */
+/*   By: nkuydin <nkuydin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026-04-24 09:48:17 by Nikita_Kuydin     #+#    #+#             */
-/*   Updated: 2026-04-24 09:48:17 by Nikita_Kuydin    ###   ########.fr       */
+/*   Created: 2026/04/24 09:48:17 by Nikita_Kuyd       #+#    #+#             */
+/*   Updated: 2026/06/06 15:15:15 by nkuydin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/cub3d.h"
 
 // EVERYWHERE the function returns 1 on failure
-
-void	print_map(t_data *data)
-{
-	int	x = 0;
-	int	y;
-
-	while (data->map[x])
-	{
-		y = 0;
-		while (data->map[x][y])
-		{
-			printf("%i", data->map[x][y]);
-			y++;
-		}
-		printf("\n");
-		x++;
-	}
-}
 
 static int	init_row_lengths(t_data *data)
 {
@@ -61,24 +43,26 @@ void	start_game(t_data *data)
 	prep_game(data);
 	data->mlx = mlx_init(data->win_width, data->win_height, "cub3d", false);
 	if (!data->mlx)
-	{
-		ft_putstr_fd("data: Error: mlx: Could not initialize mlx", 2);
-		ft_error(data, 1);
-	}
+		ft_error(data, 1, NOT_INIT);
+	data->image = mlx_new_image(data->mlx, data->win_width,
+			data->win_height);
+	if (!data->image)
+		ft_error(data, 1, NOT_INIT_IMG_BUF);
+	if (mlx_image_to_window(data->mlx, data->image, 0, 0) < 0)
+		ft_error(data, 1, CANT_CREATE_INSTANCE);
 	draw_game(data, &data->player);
 	mlx_key_hook(data->mlx, key_hook, data);
 	mlx_loop_hook(data->mlx, loop_hook, data);
 	mlx_loop(data->mlx);
-	mlx_terminate(data->mlx);
-	free(data);
+	free_data(data);
 }
 
 int	parsing(t_data *data, char **argv)
 {
 	if (check_file(argv[1], true))
-		ft_error(data, 0);
+		ft_error(data, 0, NULL);
 	if (map_copy_into_file(argv[1], data))
-		ft_error(data, 0);
+		ft_error(data, 0, NULL);
 	if (extract_data_from_file(data))
 		return (free_data(data));
 	if (check_textures(&data->texrgbinfo))
@@ -102,7 +86,7 @@ int	main(int argc, char **argv)
 	init_data(data);
 	if (parsing(data, argv) != 0)
 		return (0);
-	// print_map(data);
+	header();
 	start_game(data);
 	return (0);
 }

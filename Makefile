@@ -12,6 +12,7 @@ HEADERS = -I ${MLX_DIR}/include -I ${LIBFT_DIR}
 LIBS = ${MLX_DIR}/build/libmlx42.a ${LIBFT_DIR}/libft.a -pthread -lm -lglfw
 SRC = main.c \
 	init_data.c \
+	header.c \
 	parsing/permission.c \
 	parsing/map_copy.c \
 	parsing/extract_data.c \
@@ -55,6 +56,12 @@ mlx:
 	@cmake -S ${MLX_DIR} -B ${MLX_DIR}/build
 	@cmake --build ${MLX_DIR}/build -j4
 
+bonus:
+	make all BONUS=1
+
+leaks:
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes \
+	--suppressions=mlx.supp -s ./cub3D maps/valid/hard.cub
 # Clean objects
 clean:
 	rm -rf ${OBJ_DIR}
