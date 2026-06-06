@@ -1,0 +1,60 @@
+{
+   mlx_leak
+   Memcheck:Leak
+   ...
+   fun:mlx_*
+}
+{
+   x11_leak
+   Memcheck:Leak
+   ...
+   obj:*/libX11.so.*
+}
+{
+   xcb_leak
+   Memcheck:Leak
+   ...
+   obj:*/libxcb.so.*
+}
+{
+   xrender_leak
+   Memcheck:Leak
+   ...
+   obj:*/libXrender.so.*
+}
+{
+   llvm_leak
+   Memcheck:Leak
+   ...
+   obj:*/libLLVM*.so.*
+}
+{
+   gpu_driver_leak
+   Memcheck:Leak
+   ...
+   obj:*/dri/*.so
+}
+{
+   opengl_leak
+   Memcheck:Leak
+   ...
+   obj:*/libGL.so.*
+}
+{
+   mesa_leak
+   Memcheck:Leak
+   ...
+   obj:*/libglapi.so.*
+}
+{
+   libc_dlopen_leak
+   Memcheck:Leak
+   ...
+   fun:dlopen*
+}
+{
+   libc_loader_leak
+   Memcheck:Leak
+   ...
+   fun:_dl_*
+}

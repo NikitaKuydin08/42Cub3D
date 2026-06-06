@@ -6,7 +6,7 @@
 /*   By: nkuydin <nkuydin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/24 09:48:17 by Nikita_Kuyd       #+#    #+#             */
-/*   Updated: 2026/06/05 23:16:54 by nkuydin          ###   ########.fr       */
+/*   Updated: 2026/06/06 15:15:15 by nkuydin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,7 @@ int	main(int argc, char **argv)
 	init_data(data);
 	if (parsing(data, argv) != 0)
 		return (0);
-	// header();
+	header();
 	start_game(data);
 	return (0);
 }

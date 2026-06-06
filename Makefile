@@ -2,7 +2,7 @@
 NAME = cub3D
 
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -g -fsanitize=address
+CFLAGS = -Wall -Wextra -Werror -g
 MLX_DIR = ./MLX42
 LIBFT_DIR = ./libft
 OBJ_DIR = objects/
@@ -56,6 +56,12 @@ mlx:
 	@cmake -S ${MLX_DIR} -B ${MLX_DIR}/build
 	@cmake --build ${MLX_DIR}/build -j4
 
+bonus:
+	make all BONUS=1
+
+leaks:
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes \
+	--suppressions=mlx.supp -s ./cub3D maps/valid/hard.cub
 # Clean objects
 clean:
 	rm -rf ${OBJ_DIR}

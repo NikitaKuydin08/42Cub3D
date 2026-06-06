@@ -6,7 +6,7 @@
 /*   By: nkuydin <nkuydin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/16 08:14:56 by Nikita_Kuyd       #+#    #+#             */
-/*   Updated: 2026/06/05 17:13:12 by nkuydin          ###   ########.fr       */
+/*   Updated: 2026/06/06 15:17:31 by nkuydin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,13 +78,13 @@ static void	do_dda(t_ray *ray, t_data *data)
 		{
 			ray->sidedist_x += ray->deltadist_x;
 			ray->map_x += ray->step_x;
-			ray->side = 0; // x grid
+			ray->side = 0;
 		}
 		else
 		{
 			ray->sidedist_y += ray->deltadist_y;
 			ray->map_y += ray->step_y;
-			ray->side = 1; // y grid
+			ray->side = 1;
 		}
 		if (!check_limit_dda(data, ray->map_x, ray->map_y))
 			break ;
@@ -116,4 +116,3 @@ void	raycasting(t_player *player, t_data *data)
 		x++;
 	}
 }
-

@@ -6,7 +6,7 @@
 /*   By: nkuydin <nkuydin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/24 09:52:39 by Nikita_Kuyd       #+#    #+#             */
-/*   Updated: 2026/06/05 23:11:04 by nkuydin          ###   ########.fr       */
+/*   Updated: 2026/06/06 15:17:53 by nkuydin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,10 @@
 # define MOVE_SPEED 1
 # define ROT_RIGHT 0.25
 # define ROT_LEFT -0.25
+
+# ifndef BONUS
+#  define BONUS 1
+# endif
 
 // ERROR MESSAGES //
 # define USAGE "Usage: ./cub3d <path/to/map.cub>"
@@ -84,7 +88,6 @@ char (including signs)"
 # define NOT_INIT_IMG_BUF "data: Error: mlx: Could not allocate a new \
 			image buffer"
 # define CANT_CREATE_INSTANCE "data: Error: mlx: Could not draw a new image"
-
 
 // STRUCTURES //
 typedef struct s_line

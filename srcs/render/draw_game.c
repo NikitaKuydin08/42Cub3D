@@ -6,11 +6,16 @@
 /*   By: nkuydin <nkuydin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/15 07:19:25 by Nikita_Kuyd       #+#    #+#             */
-/*   Updated: 2026/06/05 20:33:51 by nkuydin          ###   ########.fr       */
+/*   Updated: 2026/06/06 15:16:36 by nkuydin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/cub3d.h"
+
+// static void	draw_minimap(t_data *data)
+// {
+	
+// }
 
 static void	draw_image(t_data *data)
 {
@@ -34,4 +39,6 @@ void	draw_game(t_data *data, t_player *player)
 {
 	raycasting(player, data);
 	draw_image(data);
+	// if (BONUS)
+	// 	draw_minimap(data);
 }
