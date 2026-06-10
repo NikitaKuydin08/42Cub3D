@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   extract_data.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: Nikita_Kuydin <nikitakuydin@qmail.com>     #+#  +:+       +#+        */
+/*   By: mateon <mateon@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026-05-04 11:35:37 by Nikita_Kuydin     #+#    #+#             */
-/*   Updated: 2026-05-04 11:35:37 by Nikita_Kuydin    ###   ########.fr       */
+/*   Created: 2026/05/04 11:35:37 by Nikita_Kuyd       #+#    #+#             */
+/*   Updated: 2026/06/07 15:45:03 by mateon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 

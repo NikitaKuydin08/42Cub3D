@@ -3,14 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   error.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nkuydin <nkuydin@student.42.fr>            +#+  +:+       +#+        */
+/*   By: mateon <mateon@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/02 07:12:57 by Nikita_Kuyd       #+#    #+#             */
-/*   Updated: 2026/06/05 21:10:10 by nkuydin          ###   ########.fr       */
+/*   Updated: 2026/06/10 17:10:24 by mateon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/cub3d.h"
+// the tester works with error message 1 but not with 2 
+// (might need to change it to 2 later))
 
 int	print_err_msg(char *msg)
 {

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cub3d.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nkuydin <nkuydin@student.42.fr>            +#+  +:+       +#+        */
+/*   By: mateon <mateon@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/24 09:52:39 by Nikita_Kuyd       #+#    #+#             */
-/*   Updated: 2026/06/06 15:17:53 by nkuydin          ###   ########.fr       */
+/*   Updated: 2026/06/10 16:34:18 by mateon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,6 @@
 // VARIABLES //
 # define WIN_HEIGHT 800
 # define WIN_WIDTH 800
-# define FOV 60
-# define PI 3.14159265359
 
 # define NORTH 0
 # define SOUTH 1
@@ -41,13 +39,9 @@
 # define LEFT 2
 # define RIGHT 3
 
-# define MOVE_SPEED 1
+# define MOVE_SPEED 0.5
 # define ROT_RIGHT 0.25
 # define ROT_LEFT -0.25
-
-# ifndef BONUS
-#  define BONUS 1
-# endif
 
 // ERROR MESSAGES //
 # define USAGE "Usage: ./cub3d <path/to/map.cub>"

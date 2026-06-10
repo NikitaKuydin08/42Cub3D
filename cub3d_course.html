@@ -1,0 +1,1731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>cub3D — Full Code Course</title>
+<style>
+  :root{
+    --bg:#0d1117; --panel:#161b22; --panel2:#1c2330; --border:#2a3340;
+    --text:#c9d1d9; --muted:#8b949e; --head:#e6edf3;
+    --accent:#58a6ff; --green:#7ee787; --orange:#ffa657; --pink:#ff7b9c;
+    --purple:#d2a8ff; --yellow:#f2cc60; --red:#ff6b6b;
+    --kw:#ff7b72; --type:#79c0ff; --str:#a5d6ff; --num:#79c0ff;
+    --com:#8b949e; --fn:#d2a8ff; --pre:#ffa657;
+    --sb-w:280px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.65; font-size:16px;
+  }
+  code,pre,.mono{font-family:"SF Mono",ui-monospace,"JetBrains Mono",Menlo,Consolas,monospace;}
+
+  /* layout */
+  #sidebar{
+    position:fixed; top:0; left:0; width:var(--sb-w); height:100vh; overflow-y:auto;
+    background:var(--panel); border-right:1px solid var(--border); padding:22px 16px 60px;
+  }
+  #sidebar h1{font-size:18px; color:var(--head); margin:0 0 4px;}
+  #sidebar .sub{font-size:12px; color:var(--muted); margin-bottom:18px;}
+  #sidebar nav a{
+    display:block; color:var(--muted); text-decoration:none; font-size:13.5px;
+    padding:7px 10px; border-radius:7px; margin:2px 0; border-left:2px solid transparent;
+    transition:all .15s;
+  }
+  #sidebar nav a .n{color:var(--accent); font-weight:600; margin-right:8px;}
+  #sidebar nav a:hover{background:var(--panel2); color:var(--text);}
+  #sidebar nav a.active{background:rgba(88,166,255,.12); color:var(--head); border-left-color:var(--accent);}
+
+  main{margin-left:var(--sb-w); max-width:920px; padding:0 48px 120px;}
+  @media(max-width:1000px){
+    #sidebar{position:static; width:100%; height:auto; border-right:none; border-bottom:1px solid var(--border);}
+    main{margin-left:0; padding:0 20px 80px;}
+  }
+
+  /* hero */
+  header.hero{padding:60px 0 30px; border-bottom:1px solid var(--border); margin-bottom:10px;}
+  header.hero .tag{display:inline-block; font-size:12px; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--green); border:1px solid var(--border); border-radius:20px; padding:4px 12px; margin-bottom:18px;}
+  header.hero h1{font-size:42px; margin:0 0 12px; color:var(--head); line-height:1.1;}
+  header.hero h1 span{background:linear-gradient(90deg,var(--accent),var(--purple)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;}
+  header.hero p{color:var(--muted); font-size:18px; max-width:680px;}
+  .hero-meta{display:flex; gap:14px; flex-wrap:wrap; margin-top:22px;}
+  .hero-meta .chip{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:10px 14px; font-size:13px;}
+  .hero-meta .chip b{color:var(--head);}
+
+  section{padding:46px 0 10px; border-bottom:1px solid var(--border);}
+  section h2{font-size:28px; color:var(--head); margin:0 0 6px; scroll-margin-top:20px;}
+  section h2 .num{color:var(--accent); font-size:18px; font-weight:600; margin-right:10px;}
+  section h3{font-size:19px; color:var(--head); margin:30px 0 8px;}
+  section .lead{color:var(--muted); font-size:17px; margin-top:0;}
+  p{margin:12px 0;}
+  a{color:var(--accent);}
+  ul,ol{padding-left:22px;}
+  li{margin:5px 0;}
+  b,strong{color:var(--head);}
+  kbd{background:var(--panel2); border:1px solid var(--border); border-bottom-width:2px; border-radius:5px; padding:1px 7px; font-size:13px; font-family:inherit; color:var(--head);}
+  .ic{color:var(--green); font-family:monospace; background:rgba(126,231,135,.08); padding:1px 5px; border-radius:4px; font-size:14px;}
+
+  /* code blocks */
+  .codeblock{margin:18px 0; border:1px solid var(--border); border-radius:10px; overflow:hidden; background:#0a0d12;}
+  .codeblock .cb-head{display:flex; justify-content:space-between; align-items:center;
+    background:var(--panel); padding:7px 14px; font-size:12px; color:var(--muted); border-bottom:1px solid var(--border);}
+  .codeblock .cb-head .file{color:var(--accent); font-family:monospace;}
+  .codeblock .cb-head .dot{color:var(--muted);}
+  .codeblock pre{margin:0; padding:14px 16px; overflow-x:auto; font-size:13px; line-height:1.55; tab-size:4;}
+  .c-kw{color:var(--kw);} .c-type{color:var(--type);} .c-str{color:var(--str);}
+  .c-num{color:var(--num);} .c-com{color:var(--com); font-style:italic;} .c-fn{color:var(--fn);} .c-pre{color:var(--pre);}
+
+  /* boxes */
+  .box{border-radius:10px; padding:14px 18px; margin:18px 0; border:1px solid var(--border); background:var(--panel);}
+  .box .bt{font-weight:700; display:block; margin-bottom:4px; font-size:14px; letter-spacing:.02em;}
+  .box.def{border-left:3px solid var(--accent);} .box.def .bt{color:var(--accent);}
+  .box.key{border-left:3px solid var(--green);} .box.key .bt{color:var(--green);}
+  .box.warn{border-left:3px solid var(--orange);} .box.warn .bt{color:var(--orange);}
+  .box.bug{border-left:3px solid var(--red);} .box.bug .bt{color:var(--red);}
+
+  /* tables */
+  table{width:100%; border-collapse:collapse; margin:18px 0; font-size:14px;}
+  th,td{text-align:left; padding:9px 12px; border-bottom:1px solid var(--border); vertical-align:top;}
+  th{color:var(--head); background:var(--panel); font-size:13px; text-transform:uppercase; letter-spacing:.04em;}
+  td code{color:var(--green); font-size:13px;}
+  tr:hover td{background:rgba(255,255,255,.02);}
+
+  /* interactive */
+  .demo{border:1px solid var(--border); border-radius:12px; background:var(--panel); padding:18px; margin:22px 0;}
+  .demo .dt{font-size:13px; text-transform:uppercase; letter-spacing:.08em; color:var(--purple); margin-bottom:12px; font-weight:700;}
+  .demo .canvas-wrap{display:flex; gap:18px; flex-wrap:wrap; align-items:flex-start;}
+  .demo canvas{background:#070a0e; border:1px solid var(--border); border-radius:8px; display:block; image-rendering:pixelated;}
+  .demo .controls{display:flex; flex-direction:column; gap:12px; min-width:230px; flex:1;}
+  .demo .controls label{font-size:13px; color:var(--muted); display:flex; flex-direction:column; gap:4px;}
+  .demo .controls label .v{color:var(--green); font-family:monospace;}
+  .demo input[type=range]{width:100%; accent-color:var(--accent);}
+  .demo .readout{font-family:monospace; font-size:12.5px; color:var(--text); background:#0a0d12; border:1px solid var(--border); border-radius:8px; padding:10px 12px; white-space:pre-wrap; line-height:1.5;}
+  .demo button{background:var(--panel2); color:var(--text); border:1px solid var(--border); border-radius:7px; padding:7px 12px; cursor:pointer; font-size:13px;}
+  .demo button:hover{border-color:var(--accent); color:var(--head);}
+  .demo .legend{font-size:12px; color:var(--muted); margin-top:8px; display:flex; gap:16px; flex-wrap:wrap;}
+  .demo .legend span::before{content:"■ "; }
+  .lg-wall{color:var(--accent);} .lg-ray{color:var(--green);} .lg-player{color:var(--yellow);} .lg-side{color:var(--orange);}
+
+  /* Q&A */
+  details.qa{border:1px solid var(--border); border-radius:9px; margin:10px 0; background:var(--panel2); overflow:hidden;}
+  details.qa summary{cursor:pointer; padding:12px 16px; font-weight:600; color:var(--head); list-style:none; font-size:14.5px;}
+  details.qa summary::-webkit-details-marker{display:none;}
+  details.qa summary::before{content:"🎓 "; }
+  details.qa summary:hover{background:var(--panel);}
+  details.qa[open] summary{border-bottom:1px solid var(--border); color:var(--green);}
+  details.qa .ans{padding:6px 16px 16px; color:var(--text); font-size:14.5px;}
+  .qa-wrap{margin:22px 0;}
+  .qa-wrap .qt{font-size:13px; text-transform:uppercase; letter-spacing:.08em; color:var(--green); margin-bottom:8px; font-weight:700;}
+
+  .flow{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:18px 0; font-family:monospace; font-size:13px;}
+  .flow .step{background:var(--panel2); border:1px solid var(--border); border-radius:7px; padding:7px 11px; color:var(--head);}
+  .flow .arr{color:var(--accent);}
+  .foot{color:var(--muted); font-size:13px; padding:40px 0 0; text-align:center;}
+  .pill{font-size:11px; padding:2px 8px; border-radius:20px; background:var(--panel2); border:1px solid var(--border); color:var(--muted);}
+</style>
+</head>
+<body>
+
+<aside id="sidebar">
+  <h1>cub3D — Code Course</h1>
+  <div class="sub">A complete, defense-ready walkthrough of the raycaster</div>
+  <nav id="toc">
+    <a href="#overview"><span class="n">01</span>Overview &amp; flow</a>
+    <a href="#structs"><span class="n">02</span>Data structures</a>
+    <a href="#parsing"><span class="n">03</span>Parsing the .cub</a>
+    <a href="#validation"><span class="n">04</span>Map validation</a>
+    <a href="#prep"><span class="n">05</span>Game preparation</a>
+    <a href="#raycasting"><span class="n">06</span>Raycasting + DDA</a>
+    <a href="#projection"><span class="n">07</span>Distance &rarr; screen</a>
+    <a href="#textures"><span class="n">08</span>Texture mapping</a>
+    <a href="#display"><span class="n">09</span>Floor, ceiling, display</a>
+    <a href="#controls"><span class="n">10</span>Controls &amp; movement</a>
+    <a href="#memory"><span class="n">11</span>Memory &amp; MLX42</a>
+    <a href="#build"><span class="n">12</span>Makefile &amp; build</a>
+    <a href="#cheatsheet"><span class="n">★</span>Cheat sheet</a>
+  </nav>
+</aside>
+
+<main>
+
+<header class="hero">
+  <span class="tag">42 project · raycasting engine</span>
+  <h1>Understand <span>cub3D</span>, line by line</h1>
+  <p>This page explains every system in your project — from parsing the <span class="ic">.cub</span> file to drawing textured walls with a DDA raycaster — using the real code, interactive diagrams, and defense-style Q&amp;A at the end of each chapter.</p>
+  <div class="hero-meta">
+    <div class="chip"><b>Language</b> · C</div>
+    <div class="chip"><b>Graphics</b> · MLX42 (OpenGL/GLFW)</div>
+    <div class="chip"><b>Window</b> · 800×800</div>
+    <div class="chip"><b>Technique</b> · 2.5D raycasting (Wolfenstein-style)</div>
+  </div>
+</header>
+
+<!-- ================= 01 OVERVIEW ================= -->
+<section id="overview">
+  <h2><span class="num">01</span>Overview &amp; program flow</h2>
+  <p class="lead">What the program does, and the path it takes from <span class="ic">main()</span> to a moving 3D view.</p>
+
+  <p><b>Raycasting</b> is a trick to render a 3D-looking world from a 2D grid map. The world is a simple top-down grid where <span class="ic">1</span> = wall and <span class="ic">0</span> = empty. For <b>each vertical column of the screen</b> (800 columns here), we shoot one ray from the player into the grid until it hits a wall, measure the distance, and draw a vertical slice of wall whose height depends on that distance: <b>near walls are tall, far walls are short</b>. That illusion of depth is the whole game.</p>
+
+  <div class="box def"><span class="bt">Key idea</span>The map is 2D. The "3D" is faked: we never build a real 3D scene. We just draw 800 vertical strips, one per ray. This is why it's often called <b>2.5D</b>.</div>
+
+  <h3>The execution path</h3>
+  <div class="flow">
+    <span class="step">main()</span><span class="arr">→</span>
+    <span class="step">init_data()</span><span class="arr">→</span>
+    <span class="step">parsing()</span><span class="arr">→</span>
+    <span class="step">header()</span><span class="arr">→</span>
+    <span class="step">start_game()</span><span class="arr">→</span>
+    <span class="step">mlx_loop()</span>
+  </div>
+
+  <div class="codeblock" data-file="srcs/main.c · main() (l.77)">
+<script type="text/plain">
+int	main(int argc, char **argv)
+{
+	t_data	*data;
+
+	if (argc != 2)
+		return (print_err_msg(USAGE));
+	data = ft_calloc(1, sizeof(t_data));
+	if (!data)
+		return (1);
+	init_data(data);
+	if (parsing(data, argv) != 0)
+		return (0);
+	header();
+	start_game(data);
+	return (0);
+}
+</script>
+  </div>
+
+  <ul>
+    <li><b>argc check</b>: the program needs exactly one argument — the map path (<span class="ic">./cub3D maps/valid/easy.cub</span>).</li>
+    <li><b>ft_calloc</b>: the whole game state lives in one heap struct <span class="ic">t_data</span>, zeroed out.</li>
+    <li><b>init_data</b>: sets every field to a safe default (NULL / 0 / false) — crucial so cleanup never frees garbage.</li>
+    <li><b>parsing</b>: reads &amp; validates the file. If it returns non-zero, <span class="ic">main</span> just returns 0 (the error was already printed and memory freed inside).</li>
+    <li><b>start_game</b>: opens the window, draws the first frame, registers the hooks, and enters the blocking MLX loop.</li>
+  </ul>
+
+  <div class="codeblock" data-file="srcs/main.c · parsing() (l.60)">
+<script type="text/plain">
+int	parsing(t_data *data, char **argv)
+{
+	if (check_file(argv[1], true))
+		ft_error(data, 0, NULL);
+	if (map_copy_into_file(argv[1], data))
+		ft_error(data, 0, NULL);
+	if (extract_data_from_file(data))
+		return (free_data(data));
+	if (check_textures(&data->texrgbinfo))
+		return (free_data(data));
+	if (check_map(data))
+		return (free_data(data));
+	if (init_row_lengths(data))
+		return (free_data(data));
+	return (0);
+}
+</script>
+  </div>
+  <p>This is the parsing pipeline — read it top to bottom: validate the file, copy it into memory, split textures/colors from the map, validate textures &amp; colors, validate the map, then precompute each row's logical length. Every helper returns <b>1 on failure</b> (a convention used everywhere in the project).</p>
+
+  <div class="qa-wrap">
+    <div class="qt">Defense questions</div>
+    <details class="qa"><summary>In one sentence, what is raycasting and why is cub3D "2.5D"?</summary>
+      <div class="ans">For every screen column we cast one ray across a 2D grid until it hits a wall, then draw a vertical wall slice whose height is inversely proportional to the distance. It's 2.5D because the world data is purely 2D — there's no real 3D geometry, only per-column projection.</div></details>
+    <details class="qa"><summary>Why is the entire state stored in a single <code>t_data</code> allocated with ft_calloc?</summary>
+      <div class="ans">A single struct keeps the code clean (one pointer passed everywhere) and <code>calloc</code> zero-initializes it, so every pointer starts NULL. That makes <code>free_data</code> safe to call at any failure point — it never frees uninitialized garbage.</div></details>
+    <details class="qa"><summary>What happens if parsing fails halfway through?</summary>
+      <div class="ans">Each step returns 1 on error. The first two steps call <code>ft_error</code> (print + free + exit); the rest <code>return (free_data(data))</code> which frees everything and returns 1, so <code>main</code> sees a non-zero result and returns 0 without ever opening a window.</div></details>
+  </div>
+</section>
+
+<!-- ================= 02 STRUCTS ================= -->
+<section id="structs">
+  <h2><span class="num">02</span>Data structures</h2>
+  <p class="lead">Four structs hold the whole program. Know these cold — most defense questions point at a field.</p>
+
+  <h3>t_player — where the camera is and where it looks</h3>
+  <div class="codeblock" data-file="includes/cub3d.h · t_player (l.139)">
+<script type="text/plain">
+typedef struct s_player
+{
+	char	orientation;   // spawn direction read from map: N S E W
+	int		x;             // spawn grid column
+	int		y;             // spawn grid row
+	double	pos_x;         // exact position (float) used by raycasting
+	double	pos_y;
+	double	dir_x;         // direction vector (where the player looks), unit length
+	double	dir_y;
+	double	plane_x;       // camera plane, perpendicular to dir; its length sets the FOV
+	double	plane_y;
+}	t_player;
+</script>
+  </div>
+  <div class="box def"><span class="bt">dir vs plane</span><b>dir</b> is the look direction (length 1). <b>plane</b> is perpendicular to dir and controls how wide the field of view is. Together they form the "camera": rays are spread between <span class="ic">dir − plane</span> (left edge) and <span class="ic">dir + plane</span> (right edge).</div>
+
+  <h3>t_ray — scratch state for one column's ray</h3>
+  <div class="codeblock" data-file="includes/cub3d.h · t_ray (l.117)">
+<script type="text/plain">
+typedef struct s_ray
+{
+	double	camera_x;      // column mapped to [-1, +1] across the screen
+	double	ray_x;         // ray direction = dir + plane * camera_x
+	double	ray_y;
+	int		map_x;         // current grid cell the ray is stepping through
+	int		map_y;
+	double	sidedist_x;    // distance from player to next X / Y grid line
+	double	sidedist_y;
+	double	deltadist_x;   // distance to cross one full grid cell in X / Y
+	double	deltadist_y;
+	int		step_x;        // +1 or -1: which way the ray walks the grid
+	int		step_y;
+	int		hit;           // 1 once a wall is reached
+	int		side;          // 0 = hit a vertical (X) wall, 1 = horizontal (Y) wall
+	double	distwall;      // perpendicular distance to the wall (no fisheye)
+	int		draw_start;    // first screen row of the wall slice
+	int		draw_end;      // last screen row of the wall slice
+	int		line_height;   // height of the wall slice in pixels
+	double	pos_on_wall;   // 0..1: exactly where on the wall the ray landed (for texture X)
+}	t_ray;
+</script>
+  </div>
+
+  <h3>t_texrgbinfo — textures &amp; colors</h3>
+  <div class="codeblock" data-file="includes/cub3d.h · t_texrgbinfo (l.102)">
+<script type="text/plain">
+typedef struct s_texrgbinfo
+{
+	char			*north;       // path strings parsed from the file (NO/SO/WE/EA)
+	char			*south;
+	char			*west;
+	char			*east;
+	char			*floor;       // raw "R,G,B" strings (F / C)
+	char			*ceiling;
+	uint32_t		hex_floor;    // colors converted to 0xRRGGBBFF
+	uint32_t		hex_ceiling;
+	mlx_texture_t	*tex[4];      // loaded PNGs, indexed by NORTH/SOUTH/EAST/WEST
+	int				index;        // which texture the current ray needs
+	t_line			line;         // helper for stepping through a texture column
+}	t_texrgbinfo;
+</script>
+  </div>
+  <div class="box warn"><span class="bt">Watch the index order</span>The defines are <span class="ic">NORTH 0, SOUTH 1, EAST 2, WEST 3</span> (cub3d.h l.34-37), and <span class="ic">tex[]</span> is filled in that order in <span class="ic">prep_game</span>. So <span class="ic">tex[2]</span> is EAST, not WEST — a classic off-by-confusion to avoid.</div>
+
+  <h3>t_data — the master struct</h3>
+  <p>It bundles MLX handles, the file lines, the map grid, the render buffer, and the three structs above. The most important fields for rendering:</p>
+  <table>
+    <tr><th>Field</th><th>Role</th></tr>
+    <tr><td>mlx, image</td><td>MLX42 context and the off-screen image we draw into.</td></tr>
+    <tr><td>file</td><td>The raw <span class="ic">.cub</span> file, one string per line.</td></tr>
+    <tr><td>map</td><td>The map grid (rows of <span class="ic">0/1</span>), split out from <span class="ic">file</span>.</td></tr>
+    <tr><td>row_count / row_lengths</td><td>Number of map rows, and the trimmed length of each row (rows can have different widths!).</td></tr>
+    <tr><td>texture_pixels</td><td><span class="ic">[width][height]</span> color buffer — raycasting writes here, then it's blitted to the image.</td></tr>
+    <tr><td>needs_redraw</td><td>Set true on any key; the loop only re-renders when it's true (saves CPU).</td></tr>
+    <tr><td>delete / close / terminate</td><td>Guards so MLX cleanup never runs twice (double-free protection).</td></tr>
+  </table>
+
+  <div class="qa-wrap">
+    <div class="qt">Defense questions</div>
+    <details class="qa"><summary>Why store <code>pos_x/pos_y</code> as double when <code>x/y</code> are already int?</summary>
+      <div class="ans">The grid cell (int) is enough for spawn location, but raycasting and smooth movement need sub-cell precision. <code>pos_x = x + 0.5</code> puts the player in the center of the cell, and movement adds fractional amounts.</div></details>
+    <details class="qa"><summary>What does the <code>side</code> field mean and why do we need it?</summary>
+      <div class="ans">It records whether the ray crossed a vertical grid line (side 0) or a horizontal one (side 1) when it hit the wall. It's used to (a) compute the correct perpendicular distance and (b) pick the right wall texture (N/S vs E/W).</div></details>
+    <details class="qa"><summary>Why does each row need its own length in <code>row_lengths</code>?</summary>
+      <div class="ans">Maps aren't required to be rectangular — rows can differ in width and may have trailing spaces. Storing a per-row trimmed length lets bounds checks (<code>check_limit_dda</code>) and collision avoid reading past the end of a short row.</div></details>
+  </div>
+</section>
+
+<!-- ================= 03 PARSING ================= -->
+<section id="parsing">
+  <h2><span class="num">03</span>Parsing the .cub file</h2>
+  <p class="lead">Read the file into memory, then split it into "header" (textures + colors) and "map".</p>
+
+  <h3>The file format</h3>
+  <div class="codeblock" data-file="maps/valid/easy.cub">
+<script type="text/plain">
+NO textures/yellow/yellow0.png
+SO textures/yellow/yellow1.png
+WE textures/yellow/yellow2.png
+EA textures/yellow/yellow3.png
+
+F 135,206,250
+C 0, 0, 166
+
+11111111111111111111111111111111111111
+10000000000000010000000000000000000001
+100000000000000000000000W0000000000001
+...
+11111111111111111111111111111111111111
+</script>
+  </div>
+  <ul>
+    <li><span class="ic">NO/SO/WE/EA</span> = wall texture paths (must be <span class="ic">.png</span>).</li>
+    <li><span class="ic">F</span> / <span class="ic">C</span> = floor / ceiling color as <span class="ic">R,G,B</span> (0–255). Spaces around values are tolerated.</li>
+    <li>The map is the last block; <span class="ic">1</span> = wall, <span class="ic">0</span> = floor, one of <span class="ic">N/S/E/W</span> = player start &amp; facing.</li>
+  </ul>
+
+  <h3>Step 1 — copy the whole file into memory</h3>
+  <p><span class="ic">map_copy_into_file</span> counts the lines first, allocates a <span class="ic">char **file</span> array, then reads each line with <span class="ic">get_next_line</span>. After this, the program never touches the file descriptor again — everything works on <span class="ic">data->file</span>.</p>
+  <div class="codeblock" data-file="srcs/parsing/map_copy.c · map_copy_into_file (l.79)">
+<script type="text/plain">
+int	map_copy_into_file(char *arg, t_data *data)
+{
+	int	row;
+	int	column;
+	int	i;
+
+	i = 0;
+	row = 0;
+	column = 0;
+	data->line_count = count_lines(arg);
+	data->path = arg;
+	data->file = ft_calloc(data->line_count + 1, sizeof(char *));
+	if (!data->file)
+		return (print_err_msg(ERR_MALLOC));
+	data->fd = open(data->path, O_RDONLY);
+	if (data->fd < 0)
+		return (print_err_msg(strerror(errno)));
+	else
+	{
+		copy_file(row, column, i, data);
+		close(data->fd);
+	}
+	return (0);
+}
+</script>
+  </div>
+
+  <h3>Step 2 — separate header from map</h3>
+  <p><span class="ic">extract_data_from_file</span> walks every line. Blank lines are skipped <em>unless</em> the map already started — then anything non-blank after it is an error (the map must be the last block).</p>
+  <div class="codeblock" data-file="srcs/parsing/extract_data.c · extract_data_from_file (l.140)">
+<script type="text/plain">
+int	extract_data_from_file(t_data *data)
+{
+	int	row;
+
+	row = 0;
+	data->map = ft_calloc(data->line_count + 1, sizeof(char *));
+	if (!data->map)
+		return (print_err_msg(ERR_MALLOC));
+	while (row < data->line_count)
+	{
+		if (is_blank_line(data->file[row]))
+		{
+			if (data->map_started)
+			{
+				if (!rest_is_blank(data->file, row + 1))
+					return (print_err_msg(MAP_NOT_LAST));
+				break ;
+			}
+		}
+		else if (store_data(data, data->file[row]))
+			return (1);
+		row++;
+	}
+	return (finalize(data));
+}
+</script>
+  </div>
+  <p>The decision "is this a header line or a map line?" is made by <span class="ic">is_rgb_or_tex</span>: a line is a header line if it contains any character that is <em>not</em> a valid map character.</p>
+  <div class="codeblock" data-file="srcs/parsing/helps_to_extract.c · is_rgb_or_tex (l.47)">
+<script type="text/plain">
+int	is_rgb_or_tex(char *line)
+{
+	int	i;
+
+	i = 0;
+	while (line[i])
+	{
+		if (!ft_strchr("01 \tNSEW\r\n", line[i]))
+			return (1);
+		i++;
+	}
+	return (0);
+}
+</script>
+  </div>
+
+  <h3>Step 3 — store one header line</h3>
+  <p><span class="ic">recognise_texture</span> returns a pointer to the right field (the "slot"). <span class="ic">store_texture</span> then refuses unknown identifiers, duplicates, and missing whitespace, and finally fills the slot with either an RGB string or a texture path.</p>
+  <div class="codeblock" data-file="srcs/parsing/extract_data.c · store_texture (l.94)">
+<script type="text/plain">
+static int	store_texture(t_data *data, char *line)
+{
+	t_texrgbinfo	*info;
+	char			**slot;
+	int				i;
+
+	i = 0;
+	info = &data->texrgbinfo;
+	while (line[i] && line[i] <= 32)
+		i++;
+	slot = recognise_texture(info, line, &i);
+	if (!slot)
+		return (print_err_msg(UNKNOWN_TEX));
+	if (*slot)
+		return (print_err_msg(DUPLICATE_TEX));
+	if (line[i] && line[i] > 32)
+		return (print_err_msg(EXPECTED_WHITESPACE));
+	if (slot == &info->floor || slot == &info->ceiling)
+		*slot = get_rgb_value(line, i);
+	else
+		*slot = get_texture_value(line, i);
+	if (!*slot)
+		return (print_err_msg(BAD_TEX_VALUE));
+	return (0);
+}
+</script>
+  </div>
+  <div class="box key"><span class="bt">Nice trick: the "slot" pointer</span>By returning <span class="ic">char **slot</span> (the address of the field), the duplicate check is just <span class="ic">if (*slot)</span> — if it's already filled, it's a duplicate. One generic function handles all six identifiers.</div>
+
+  <h3>Step 4 — RGB string → hex color</h3>
+  <p>Colors are validated and packed into a single <span class="ic">uint32_t</span> so the renderer can write them directly. The format is <span class="ic">0xRRGGBBFF</span> (FF = fully opaque alpha).</p>
+  <div class="codeblock" data-file="srcs/parsing/check_textures.c · check_rgb_to_hex (l.100)">
+<script type="text/plain">
+static int	check_rgb_to_hex(char *char_colour, uint32_t *hex_colour)
+{
+	char		**array;
+	int			i;
+	uint32_t	rgb[3];
+
+	i = 0;
+	array = ft_split(char_colour, ',');
+	if (!array)
+		return (print_err_msg(ERR_MALLOC));
+	while (array[i])
+		i++;
+	if (i != 3)
+	{
+		free_tab((void **)array);
+		return (print_err_msg(INVALID_COUNT_RGB));
+	}
+	i = 0;
+	if (convert_n_check(array, rgb))
+	{
+		free_tab((void **)array);
+		return (1);
+	}
+	free_tab((void **)array);
+	*hex_colour = (rgb[0] << 24) | (rgb[1] << 16) | (rgb[2] << 8) | (0xFF);
+	return (0);
+}
+</script>
+  </div>
+  <p><span class="ic">ft_split</span> on <span class="ic">','</span> must give exactly 3 tokens; each token is checked to be digits-only and within <span class="ic">[0,255]</span> by <span class="ic">convert_n_check</span>; then the bit-shifts pack them: red into the top byte, then green, then blue, then alpha.</p>
+
+  <div class="qa-wrap">
+    <div class="qt">Defense questions</div>
+    <details class="qa"><summary>Why copy the whole file into memory instead of parsing it directly from the fd?</summary>
+      <div class="ans">It lets the parser look both backwards and forwards freely (e.g. "is everything after the map blank?") without re-seeking the file, and it cleanly separates I/O from logic. The fd is opened, fully read, then closed.</div></details>
+    <details class="qa"><summary>How does the code decide a line belongs to the map vs the header?</summary>
+      <div class="ans"><code>is_rgb_or_tex</code> scans the line: if it contains any character outside <code>01 \t NSEW \r \n</code>, it's a header line (it has letters/digits/paths). Otherwise it's treated as a map line. Once <code>map_started</code> is true, header parsing stops.</div></details>
+    <details class="qa"><summary>Walk me through how "F 135,206,250" becomes a 32-bit color.</summary>
+      <div class="ans"><code>get_rgb_value</code> extracts the string "135,206,250"; <code>ft_split</code> by comma gives 3 tokens; each is validated as digits in [0,255]; then <code>(135&lt;&lt;24)|(206&lt;&lt;16)|(250&lt;&lt;8)|0xFF</code> packs them as 0xRRGGBBFF.</div></details>
+    <details class="qa"><summary>What stops "NO file.png garbage" from passing?</summary>
+      <div class="ans"><code>get_texture_value</code> reads the path, then skips trailing whitespace; if any non-whitespace remains after the path, it frees the result and returns NULL, which triggers <code>BAD_TEX_VALUE</code>.</div></details>
+  </div>
+</section>
+
+<!-- ================= 04 VALIDATION ================= -->
+<section id="validation">
+  <h2><span class="num">04</span>Map validation</h2>
+  <p class="lead">Once the map grid is isolated, it must be legal: valid characters, exactly one player, and walls everywhere around the floor.</p>
+
+  <div class="codeblock" data-file="srcs/parsing/check_map.c · check_map (l.95)">
+<script type="text/plain">
+int	check_map(t_data *data)
+{
+	if (!data->map)
+		return (print_err_msg(MISSING_MAP));
+	if (data->row_count < 3)
+		return (print_err_msg(MAP_TOO_SMALL));
+	if (check_elements(data, data->map))
+		return (1);
+	if (check_closure(data, data->map))
+		return (1);
+	if (check_player_position(data, data->map))
+		return (1);
+	return (0);
+}
+</script>
+  </div>
+
+  <h3>Valid characters &amp; finding the player</h3>
+  <p><span class="ic">check_cell</span> rejects anything outside <span class="ic">01NSEW</span>. When it meets a direction letter, it records the spawn (orientation + grid x/y), <b>replaces the letter with <span class="ic">'0'</span></b> so the cell becomes walkable floor, and a second player is an error.</p>
+  <div class="codeblock" data-file="srcs/parsing/check_map.c · check_cell (l.50)">
+<script type="text/plain">
+static int	check_cell(t_data *data, char **map, int i, int j)
+{
+	if (!ft_strchr("01NSEW", map[i][j]))
+		return (print_err_msg(WRONG_CHAR));
+	if (ft_strchr("NSEW", map[i][j]))
+	{
+		if (data->player.orientation != '0')
+			return (print_err_msg(MULTIPLE_PLAYER));
+		data->player.orientation = map[i][j];
+		map[i][j] = '0';
+		data->player.x = j;
+		data->player.y = i;
+	}
+	return (0);
+}
+</script>
+  </div>
+
+  <h3>Closure — no holes in the surrounding walls</h3>
+  <p>The idea: every walkable cell (<span class="ic">0</span> or where the player stood) must have a wall (or be inside the grid) on all four sides. A space or an out-of-bounds neighbor = a leak to the outside = invalid map.</p>
+  <div class="codeblock" data-file="srcs/parsing/check_map_closure.c · is_open / check_neighbor (l.15)">
+<script type="text/plain">
+static int	is_open(t_data *data, int i, int j)
+{
+	int	len;
+
+	if (i < 0 || i >= data->row_count)
+		return (1);
+	len = ft_strlen(data->map[i]);
+	if (j < 0 || j >= len)
+		return (1);
+	if (data->map[i][j] <= 32)
+		return (1);
+	return (0);
+}
+
+static int	check_neighbor(t_data *data, int i, int j)
+{
+	if (is_open(data, i - 1, j))
+		return (print_err_msg(WALL_HOLE_NORTH));
+	if (is_open(data, i + 1, j))
+		return (print_err_msg(WALL_HOLE_SOUTH));
+	if (is_open(data, i, j - 1))
+		return (print_err_msg(WALL_HOLE_WEST));
+	if (is_open(data, i, j + 1))
+		return (print_err_msg(WALL_HOLE_EAST));
+	return (0);
+}
+</script>
+  </div>
+
+  <div class="box bug"><span class="bt">⚠ Real bug to know for the defense</span>Look closely at <span class="ic">check_closure</span> (l.42-63): when a hole is found it does <span class="ic">if (... &amp;&amp; check_neighbor(...)) return (0);</span>. Since <span class="ic">print_err_msg</span> returns <b>1</b>, <span class="ic">check_neighbor</span> returns 1 on a hole, the condition is true… and the function <b>returns 0 (success)</b>. So the error message <em>prints</em>, but the map is <b>not actually rejected</b> — and <span class="ic">check_closure</span> always returns 0. An evaluator may push on this. The fix would be <span class="ic">return (1);</span> there (or just <span class="ic">return (check_neighbor(...))</span> when it's non-zero).</div>
+
+  <h3>Player not trapped</h3>
+  <p><span class="ic">check_player_position</span> makes sure the player has at least one floor cell (<span class="ic">'0'</span>) directly adjacent — otherwise it's boxed in.</p>
+  <div class="codeblock" data-file="srcs/parsing/check_map.c · check_player_position (l.32)">
+<script type="text/plain">
+static int	check_player_position(t_data *data, char **map)
+{
+	int	i;
+	int	j;
+
+	i = data->player.y;
+	j = data->player.x;
+	if (map[i - 1][j] == '0')
+		return (0);
+	if (map[i + 1][j] == '0')
+		return (0);
+	if (map[i][j - 1] == '0')
+		return (0);
+	if (map[i][j + 1] == '0')
+		return (0);
+	return (print_err_msg(TRAPPED_PLAYER));
+}
+</script>
+  </div>
+
+  <div class="qa-wrap">
+    <div class="qt">Defense questions</div>
+    <details class="qa"><summary>Why is the player letter overwritten with '0'?</summary>
+      <div class="ans">After the spawn is recorded, the cell is just floor. Replacing N/S/E/W with '0' means the rest of the engine (collision, raycasting, closure) only ever deals with '0' and '1' and never has to special-case the player tile.</div></details>
+    <details class="qa"><summary>How does closure detection work conceptually?</summary>
+      <div class="ans">For every walkable cell, check its 4 neighbors. A neighbor that is a space or outside the grid means the floor "leaks" to the exterior — the map isn't sealed. <code>is_open</code> treats out-of-bounds and anything ≤ 32 (space) as open.</div></details>
+    <details class="qa"><summary>(Trap) Is the closure check actually enforced?</summary>
+      <div class="ans">No — and that's worth admitting. <code>check_closure</code> returns 0 even when <code>check_neighbor</code> reports a hole, so an open map prints an error but still loads. It should return 1 on a detected hole. (See the bug box above.)</div></details>
+    <details class="qa"><summary>Why reject tabs in the map but allow spaces?</summary>
+      <div class="ans"><code>check_elements</code> explicitly errors on <code>'\t'</code> because a tab's visual width is ambiguous and would break the column-based bounds/closure logic; spaces are unambiguous single cells.</div></details>
+  </div>
+</section>
+
+<!-- ================= 05 PREP ================= -->
+<section id="prep">
+  <h2><span class="num">05</span>Game preparation</h2>
+  <p class="lead">Turn the parsed data into a ready-to-render state: place the camera, build the direction/plane vectors, load PNGs, allocate the pixel buffer.</p>
+
+  <div class="codeblock" data-file="srcs/render/prep_game.c · prep_game (l.51)">
+<script type="text/plain">
+void	prep_game(t_data *data)
+{
+	t_player	*player;
+	int			i;
+
+	i = -1;
+	player = &data->player;
+	player->pos_x = (double)player->x + 0.5;
+	player->pos_y = (double)player->y + 0.5;
+	prep_direction_ns(player);
+	prep_direction_we(player);
+	data->texrgbinfo.tex[NORTH] = mlx_load_png(data->texrgbinfo.north);
+	data->texrgbinfo.tex[SOUTH] = mlx_load_png(data->texrgbinfo.south);
+	data->texrgbinfo.tex[WEST] = mlx_load_png(data->texrgbinfo.west);
+	data->texrgbinfo.tex[EAST] = mlx_load_png(data->texrgbinfo.east);
+	data->texture_pixels = ft_calloc(data->win_width, sizeof(uint32_t *));
+	while (++i < data->win_width)
+		data->texture_pixels[i] = ft_calloc(data->win_height, sizeof(uint32_t));
+}
+</script>
+  </div>
+  <ul>
+    <li><b>+0.5</b>: centers the player in its grid cell.</li>
+    <li><b>direction setup</b>: depending on the spawn letter, dir and plane are hard-set (below).</li>
+    <li><b>mlx_load_png</b>: decodes each wall texture into an <span class="ic">mlx_texture_t</span> (raw RGBA pixels).</li>
+    <li><b>texture_pixels</b>: an 800×800 buffer of <span class="ic">uint32_t</span> colors, the canvas raycasting writes into.</li>
+  </ul>
+
+  <div class="codeblock" data-file="srcs/render/prep_game.c · prep_direction_ns / _we (l.15)">
+<script type="text/plain">
+// Facing North: look up (-Y), plane points to the right
+if (player->orientation == 'N') {
+	player->dir_x = 0;    player->dir_y = -1;
+	player->plane_x = 0.60; player->plane_y = 0;
+}
+// Facing South: look down (+Y)
+else if (player->orientation == 'S') {
+	player->dir_x = 0;    player->dir_y = 1;
+	player->plane_x = -0.60; player->plane_y = 0;
+}
+// Facing West: look left (-X)
+if (player->orientation == 'W') {
+	player->dir_x = -1;   player->dir_y = 0;
+	player->plane_x = 0;  player->plane_y = -0.60;
+}
+// Facing East: look right (+X)
+else if (player->orientation == 'E') {
+	player->dir_x = 1;    player->dir_y = 0;
+	player->plane_x = 0;  player->plane_y = 0.60;
+}
+</script>
+  </div>
+  <div class="box def"><span class="bt">Why 0.60?</span>The FOV satisfies <span class="ic">FOV = 2·atan(|plane| / |dir|)</span>. With <span class="ic">|dir| = 1</span> and <span class="ic">|plane| = 0.60</span>, that's <span class="ic">2·atan(0.6) ≈ 61°</span> — close to the classic 60° field of view. Plane is always perpendicular to dir, which keeps the projection undistorted.</div>
+
+  <div class="demo" id="demo-cam">
+    <div class="dt">Interactive · camera = direction + plane (the FOV fan)</div>
+    <div class="canvas-wrap">
+      <canvas id="cam-canvas" width="320" height="320"></canvas>
+      <div class="controls">
+        <label>Rotate camera <span class="v" id="cam-ang-v"></span>
+          <input type="range" id="cam-ang" min="-180" max="180" value="-90" step="1"></label>
+        <label>Plane length (FOV) <span class="v" id="cam-plane-v"></span>
+          <input type="range" id="cam-plane" min="20" max="120" value="60" step="1"></label>
+        <div class="readout" id="cam-read"></div>
+        <div class="legend"><span class="lg-player">player</span><span class="lg-ray">dir</span><span class="lg-side">plane</span><span style="color:var(--purple)">rays</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="qa-wrap">
+    <div class="qt">Defense questions</div>
+    <details class="qa"><summary>Why is the camera plane always perpendicular to the direction vector?</summary>
+      <div class="ans">Because the plane represents the projection screen in front of the player. If it weren't perpendicular, the FOV would be skewed and walls would look sheared. Keeping <code>plane ⟂ dir</code> makes the left/right rays symmetric around the view direction.</div></details>
+    <details class="qa"><summary>What sets the field of view, and how would you change it?</summary>
+      <div class="ans">The ratio of plane length to dir length. dir is unit length, so the plane length (0.60) alone sets it: FOV = 2·atan(0.6) ≈ 60°. Increase the plane to widen the FOV (more fish-eye-ish), shrink it to zoom in.</div></details>
+    <details class="qa"><summary>What would happen if you forgot the +0.5 offset?</summary>
+      <div class="ans">The player would spawn exactly on a grid corner (integer coordinate). That's on a cell boundary and can cause the very first DDA step / collision check to behave oddly. Centering at +0.5 puts the player safely inside a floor cell.</div></details>
+  </div>
+</section>
+
+<!-- ================= 06 RAYCASTING ================= -->
+<section id="raycasting">
+  <h2><span class="num">06</span>The core: raycasting + DDA</h2>
+  <p class="lead">For each of the 800 columns, build a ray and walk the grid with DDA until it hits a wall.</p>
+
+  <h3>Building one ray</h3>
+  <div class="codeblock" data-file="srcs/init_data.c · init_raycasting_dda (l.66)">
+<script type="text/plain">
+void	init_raycasting_dda(t_ray *ray, int x, t_player *player)
+{
+	init_ray(ray);
+	ray->camera_x = (2 * x) / (double)WIN_WIDTH - 1;
+	ray->ray_x = player->dir_x + player->plane_x * ray->camera_x;
+	ray->ray_y = player->dir_y + player->plane_y * ray->camera_x;
+	ray->map_x = (int)player->pos_x;
+	ray->map_y = (int)player->pos_y;
+	ray->deltadist_x = fabs(1 / ray->ray_x);
+	ray->deltadist_y = fabs(1 / ray->ray_y);
+	setup_jump_algo(ray, player);
+}
+</script>
+  </div>
+  <ul>
+    <li><b>camera_x</b>: maps column <span class="ic">x</span> (0..799) to <span class="ic">[-1, +1]</span>. Column 0 → −1 (left edge), 400 → 0 (center), 799 → ≈+1 (right edge).</li>
+    <li><b>ray direction</b> = <span class="ic">dir + plane · camera_x</span>. Center column uses pure <span class="ic">dir</span>; edges tilt toward <span class="ic">dir ± plane</span>.</li>
+    <li><b>map_x/map_y</b>: the grid cell the player currently stands in (the ray's start cell).</li>
+    <li><b>deltadist</b> = <span class="ic">|1 / ray|</span>: how far along the ray you travel to cross one full cell in X (resp. Y).</li>
+  </ul>
+
+  <h3>Setting the first step</h3>
+  <div class="codeblock" data-file="srcs/render/prep_game.c · setup_jump_algo (l.71)">
+<script type="text/plain">
+void	setup_jump_algo(t_ray *ray, t_player *player)
+{
+	if (ray->ray_x > 0)
+	{
+		ray->step_x = 1;
+		ray->sidedist_x = (ray->map_x + 1.0 - player->pos_x) * ray->deltadist_x;
+	}
+	else
+	{
+		ray->step_x = -1;
+		ray->sidedist_x = (player->pos_x - ray->map_x) * ray->deltadist_x;
+	}
+	if (ray->ray_y > 0)
+	{
+		ray->step_y = 1;
+		ray->sidedist_y = (ray->map_y + 1.0 - player->pos_y) * ray->deltadist_y;
+	}
+	else
+	{
+		ray->step_y = -1;
+		ray->sidedist_y = (player->pos_y - ray->map_y) * ray->deltadist_y;
+	}
+}
+</script>
+  </div>
+  <p><b>step_x/step_y</b> = which direction the ray walks (+1 or −1). <b>sidedist_x/sidedist_y</b> = the distance from the player to the <em>first</em> vertical / horizontal grid line in the ray's path.</p>
+
+  <h3>Walking the grid (DDA)</h3>
+  <div class="codeblock" data-file="srcs/render/raycasting.c · do_dda (l.73)">
+<script type="text/plain">
+static void	do_dda(t_ray *ray, t_data *data)
+{
+	while (ray->hit == 0)
+	{
+		if (ray->sidedist_x < ray->sidedist_y)
+		{
+			ray->sidedist_x += ray->deltadist_x;
+			ray->map_x += ray->step_x;
+			ray->side = 0;
+		}
+		else
+		{
+			ray->sidedist_y += ray->deltadist_y;
+			ray->map_y += ray->step_y;
+			ray->side = 1;
+		}
+		if (!check_limit_dda(data, ray->map_x, ray->map_y))
+			break ;
+		if (data->map[ray->map_y][ray->map_x] > '0')
+			ray->hit = 1;
+	}
+}
+</script>
+  </div>
+  <div class="box key"><span class="bt">The whole DDA in one sentence</span>Always advance toward whichever grid line is closer (smaller sidedist), move into that cell, mark which side you crossed, then check: out of bounds → stop; cell &gt; <span class="ic">'0'</span> → it's a wall, done. This jumps grid-line to grid-line, so it only tests cells the ray actually crosses — very fast.</div>
+
+  <div class="demo" id="demo-ray">
+    <div class="dt">Interactive · full raycaster (top-down rays → 3D view)</div>
+    <div class="canvas-wrap">
+      <canvas id="ray-top" width="288" height="288"></canvas>
+      <canvas id="ray-view" width="288" height="288"></canvas>
+      <div class="controls">
+        <label>Player X <span class="v" id="ray-px-v"></span><input type="range" id="ray-px" min="1.2" max="6.8" value="2.5" step="0.05"></label>
+        <label>Player Y <span class="v" id="ray-py-v"></span><input type="range" id="ray-py" min="1.2" max="6.8" value="4.5" step="0.05"></label>
+        <label>Facing angle <span class="v" id="ray-ang-v"></span><input type="range" id="ray-ang" min="-180" max="180" value="0" step="1"></label>
+        <div class="readout" id="ray-read"></div>
+        <div class="legend"><span class="lg-wall">wall</span><span class="lg-player">player</span><span class="lg-ray">rays</span></div>
+      </div>
+    </div>
+    <p style="font-size:13px;color:var(--muted);margin:10px 0 0">Left = the 2D grid with the FOV fan of rays. Right = the exact image those rays produce (each ray → one column). Move/turn and watch near walls grow tall, far walls shrink.</p>
+  </div>
+
+  <div class="qa-wrap">
+    <div class="qt">Defense questions</div>
+    <details class="qa"><summary>Why DDA instead of stepping the ray by tiny fixed increments?</summary>
+      <div class="ans">Tiny fixed steps can skip thin walls or waste cycles inside a cell. DDA jumps directly from one grid line to the next, testing every crossed cell exactly once. It's exact (no missed walls) and as fast as the number of cells crossed.</div></details>
+    <details class="qa"><summary>What exactly is <code>deltadist_x</code>?</summary>
+      <div class="ans">The distance traveled <em>along the ray</em> for the ray to move exactly one cell in the X direction. It's <code>|1/ray_x|</code> — derived from similar triangles. Same idea for Y.</div></details>
+    <details class="qa"><summary>Why is the wall test <code>map[..][..] &gt; '0'</code> and not <code>== '1'</code>?</summary>
+      <div class="ans">Any character greater than '0' (so '1' and beyond) counts as a wall. After validation the map only holds '0' and '1', so in practice it means "is this a wall." Using <code>&gt; '0'</code> is just a permissive way to say "not floor."</div></details>
+    <details class="qa"><summary>How does the loop avoid reading outside the map?</summary>
+      <div class="ans"><code>check_limit_dda</code> verifies <code>map_y</code> is within <code>row_count</code> and <code>map_x</code> within that row's length before the cell is dereferenced; if not, it <code>break</code>s out of the DDA.</div></details>
+  </div>
+</section>
+
+<!-- ================= 07 PROJECTION ================= -->
+<section id="projection">
+  <h2><span class="num">07</span>From distance to a wall on screen</h2>
+  <p class="lead">Convert the hit into a perpendicular distance (no fish-eye), then into a slice height and screen position.</p>
+
+  <div class="codeblock" data-file="srcs/render/raycasting.c · distance_ray_to_wall (l.49)">
+<script type="text/plain">
+static void	distance_ray_to_wall(t_ray *ray, t_player *player, t_data *data)
+{
+	if (ray->side == 0)
+		ray->distwall = ray->sidedist_x - ray->deltadist_x;
+	else
+		ray->distwall = ray->sidedist_y - ray->deltadist_y;
+	if (ray->distwall < 0.0001)
+		ray->distwall = 0.0001;
+	ray->line_height = (int)(data->win_height / ray->distwall);
+	if (ray->line_height < 0)
+		ray->line_height = 0;
+	ray->draw_start = (data->win_height / 2) - (ray->line_height / 2);
+	if (ray->draw_start < 0)
+		ray->draw_start = 0;
+	ray->draw_end = (data->win_height / 2) + (ray->line_height / 2);
+	if (ray->draw_end >= data->win_height)
+		ray->draw_end = data->win_height - 1;
+	if (ray->side == 0)
+		ray->pos_on_wall = player->pos_y + ray->distwall * ray->ray_y;
+	else
+		ray->pos_on_wall = player->pos_x + ray->distwall * ray->ray_x;
+	ray->pos_on_wall -= floor(ray->pos_on_wall);
+}
+</script>
+  </div>
+
+  <h3>Perpendicular distance — the fish-eye fix</h3>
+  <p>We use <span class="ic">sidedist − deltadist</span>, which is the distance measured <b>perpendicular to the camera plane</b>, not the straight-line (Euclidean) distance from the eye. If we used Euclidean distance, walls would bulge outward at the screen edges (fish-eye), because edge rays are longer than center rays even for a flat wall. The perpendicular distance cancels that out.</p>
+
+  <div class="demo" id="demo-fish">
+    <div class="dt">Interactive · why we need perpendicular distance</div>
+    <div class="canvas-wrap">
+      <canvas id="fish-canvas" width="288" height="288"></canvas>
+      <div class="controls">
+        <label>Distance to wall <span class="v" id="fish-d-v"></span><input type="range" id="fish-d" min="1.5" max="6" value="3" step="0.1"></label>
+        <label><input type="checkbox" id="fish-fix" checked> use perpendicular distance (fix)</label>
+        <div class="readout" id="fish-read"></div>
+        <p style="font-size:12px;color:var(--muted);margin:0">A flat wall straight ahead. With the fix off (Euclidean), the wall curves; with it on, it stays flat — exactly what the real code does.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>Slice height &amp; vertical placement</h3>
+  <ul>
+    <li><b>line_height = WIN_HEIGHT / distwall</b> — closer wall ⇒ taller slice. The <span class="ic">0.0001</span> clamp avoids divide-by-zero.</li>
+    <li><b>draw_start / draw_end</b> center the slice on the horizon (<span class="ic">WIN_HEIGHT / 2</span>) and clamp to the screen, so a huge near wall is simply cropped.</li>
+    <li><b>pos_on_wall</b> — the exact hit point along the wall, then <span class="ic">− floor()</span> keeps only the fractional part (0..1): "how far across this wall tile did we hit?" This drives the texture X coordinate (next chapter).</li>
+  </ul>
+
+  <div class="qa-wrap">
+    <div class="qt">Defense questions</div>
+    <details class="qa"><summary>What is the fish-eye effect and how is it removed here?</summary>
+      <div class="ans">Edge rays travel farther than center rays for the same flat wall, so using raw (Euclidean) distance makes walls bulge. Using the distance perpendicular to the camera plane (<code>sidedist − deltadist</code>) makes a flat wall render flat. Try the toggle above.</div></details>
+    <details class="qa"><summary>Why <code>line_height = WIN_HEIGHT / distwall</code>?</summary>
+      <div class="ans">It's the projection: apparent size is inversely proportional to distance. A wall one unit away fills (about) the whole screen; twice as far ⇒ half the height. WIN_HEIGHT is the projection scale.</div></details>
+    <details class="qa"><summary>What is <code>pos_on_wall</code> and why subtract <code>floor()</code>?</summary>
+      <div class="ans">It's the world coordinate of the hit along the wall. Subtracting its integer part leaves a 0..1 fraction — the position across a single wall tile — which becomes the texture's X column.</div></details>
+    <details class="qa"><summary>Why clamp draw_start/draw_end to the screen?</summary>
+      <div class="ans">A very close wall produces a line_height bigger than the window; without clamping, the loop would write outside the buffer. Clamping crops the slice to visible rows only.</div></details>
+  </div>
+</section>
+
+<!-- ================= 08 TEXTURES ================= -->
+<section id="textures">
+  <h2><span class="num">08</span>Texture mapping</h2>
+  <p class="lead">Pick the right wall image, find the correct texture column, then march down it pixel by pixel.</p>
+
+  <h3>Which face did we hit?</h3>
+  <div class="codeblock" data-file="srcs/utils/utils.c · recognise_side_tex (l.24)">
+<script type="text/plain">
+void	recognise_side_tex(t_texrgbinfo *texinfo, t_ray *ray)
+{
+	if (ray->side == 0)
+	{
+		if (ray->ray_x < 0)
+			texinfo->index = WEST;
+		else
+			texinfo->index = EAST;
+	}
+	else
+	{
+		if (ray->ray_y < 0)
+			texinfo->index = NORTH;
+		else
+			texinfo->index = SOUTH;
+	}
+}
+</script>
+  </div>
+  <p>If the ray crossed a vertical grid line (<span class="ic">side 0</span>) it hit an East/West face — and the sign of <span class="ic">ray_x</span> says which. Side 1 ⇒ North/South based on <span class="ic">ray_y</span>.</p>
+
+  <h3>Drawing the textured slice</h3>
+  <div class="codeblock" data-file="srcs/render/raycasting.c · draw_texture (l.23)">
+<script type="text/plain">
+static void	draw_texture(t_ray *ray, t_data *data, t_texrgbinfo *t, int x)
+{
+	int	y;
+	int	tex_height;
+
+	recognise_side_tex(t, ray);
+	tex_height = t->tex[t->index]->height;
+	t->line.x = (int)(ray->pos_on_wall * t->tex[t->index]->width);
+	if ((ray->side == 0 && ray->ray_x > 0)
+		|| (ray->side == 1 && ray->ray_y < 0))
+		t->line.x = t->tex[t->index]->width - t->line.x - 1;
+	t->line.step = 1.0 * tex_height / ray->line_height;
+	t->line.pos = (ray->draw_start - data->win_height / 2 + ray->line_height
+			/ 2) * t->line.step;
+	y = ray->draw_start;
+	while (y < ray->draw_end)
+	{
+		t->line.y = (int)t->line.pos & (tex_height - 1);
+		t->line.pos += t->line.step;
+		makeup_color(data, t->tex[t->index], t->line.y, t->line.x);
+		if (data->color > 0)
+			data->texture_pixels[x][y] = data->color;
+		y++;
+	}
+}
+</script>
+  </div>
+  <ul>
+    <li><b>line.x</b> = <span class="ic">pos_on_wall · texture_width</span> — the texture column to sample.</li>
+    <li><b>The flip</b> mirrors the texture for two of the four faces so the image isn't reversed depending on which way the ray came.</li>
+    <li><b>line.step</b> = <span class="ic">tex_height / line_height</span> — how many texture rows to advance per screen row. Tall slice ⇒ small step (texture stretched); short slice ⇒ big step (squished).</li>
+    <li><b>line.pos</b> is the starting texture row, offset so the texture stays centered even when the slice is cropped at the top.</li>
+    <li><b>&amp; (tex_height − 1)</b> wraps the row index cheaply — works because textures are power-of-two sized.</li>
+  </ul>
+
+  <h3>Reading one texture pixel</h3>
+  <div class="codeblock" data-file="srcs/render/raycasting.c · makeup_color (l.15)">
+<script type="text/plain">
+static void	makeup_color(t_data *data, mlx_texture_t *current_tex, int y, int x)
+{
+	uint8_t		*px;
+
+	px = &current_tex->pixels[(current_tex->width * y + x) * 4];
+	data->color = (px[0] << 24) | (px[1] << 16) | (px[2] << 8) | (px[3]);
+}
+</script>
+  </div>
+  <p>MLX42 stores textures as a flat RGBA byte array, row by row. Pixel <span class="ic">(x,y)</span> starts at byte <span class="ic">(width·y + x)·4</span>. The four bytes (R,G,B,A) are packed into one <span class="ic">uint32_t</span> the renderer can store directly.</p>
+
+  <div class="demo" id="demo-tex">
+    <div class="dt">Interactive · texture column sampling &amp; vertical step</div>
+    <div class="canvas-wrap">
+      <canvas id="tex-src" width="128" height="128"></canvas>
+      <canvas id="tex-out" width="80" height="288"></canvas>
+      <div class="controls">
+        <label>pos_on_wall (texture X) <span class="v" id="tex-pos-v"></span><input type="range" id="tex-pos" min="0" max="1" value="0.4" step="0.01"></label>
+        <label>line_height (slice px) <span class="v" id="tex-h-v"></span><input type="range" id="tex-h" min="40" max="700" value="200" step="2"></label>
+        <div class="readout" id="tex-read"></div>
+        <p style="font-size:12px;color:var(--muted);margin:0">Left: the source texture; the highlighted column is the one chosen by <code>pos_on_wall</code>. Right: that column stretched to <code>line_height</code> using <code>step = tex_height/line_height</code>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="qa-wrap">
+    <div class="qt">Defense questions</div>
+    <details class="qa"><summary>How is the texture column (X) chosen?</summary>
+      <div class="ans"><code>pos_on_wall</code> (0..1, where the ray hit across the tile) times the texture width gives the column. A conditional flip mirrors it for the faces where the ray direction would otherwise reverse the image.</div></details>
+    <details class="qa"><summary>What is <code>line.step</code> and why is it a double?</summary>
+      <div class="ans">It's how much texture-Y to advance per screen-Y: <code>tex_height / line_height</code>. It's fractional (e.g. 0.32) because the wall slice rarely matches the texture height exactly — a double keeps the sampling smooth and avoids drift.</div></details>
+    <details class="qa"><summary>Why <code>& (tex_height - 1)</code> instead of a modulo?</summary>
+      <div class="ans">For power-of-two sizes, <code>x & (n-1)</code> equals <code>x % n</code> but is a single fast bitwise op and safely wraps the index so it never reads out of the texture.</div></details>
+    <details class="qa"><summary>Why pack RGBA into a uint32_t with those shifts?</summary>
+      <div class="ans">The render buffer and <code>mlx_put_pixel</code> expect one 32-bit color per pixel (0xRRGGBBAA). Shifting each byte into place builds that single value from the four texture bytes.</div></details>
+  </div>
+</section>
+
+<!-- ================= 09 DISPLAY ================= -->
+<section id="display">
+  <h2><span class="num">09</span>Floor, ceiling &amp; pushing the frame</h2>
+  <p class="lead">The main loop fills each column: ceiling above the wall, textured wall, floor below — then blits the whole buffer to the window.</p>
+
+  <div class="codeblock" data-file="srcs/render/raycasting.c · raycasting (l.96)">
+<script type="text/plain">
+void	raycasting(t_player *player, t_data *data)
+{
+	t_ray	ray;
+	int		x;
+	int		y;
+
+	ray = data->ray;
+	x = 0;
+	while (x < data->win_width)
+	{
+		y = 0;
+		init_raycasting_dda(&ray, x, player);
+		do_dda(&ray, data);
+		distance_ray_to_wall(&ray, player, data);
+		while (y < ray.draw_start)
+			data->texture_pixels[x][y++] = data->texrgbinfo.hex_ceiling;
+		y = ray.draw_end;
+		while (y < data->win_height)
+			data->texture_pixels[x][y++] = data->texrgbinfo.hex_floor;
+		draw_texture(&ray, data, &data->texrgbinfo, x);
+		x++;
+	}
+}
+</script>
+  </div>
+  <p>Per column: from the top to <span class="ic">draw_start</span> = ceiling color; from <span class="ic">draw_end</span> to the bottom = floor color; the middle = textured wall. Floor and ceiling are <b>flat colors</b> (no texture).</p>
+
+  <h3>Blitting to the window</h3>
+  <div class="codeblock" data-file="srcs/render/draw_game.c · draw_image / draw_game (l.20)">
+<script type="text/plain">
+static void	draw_image(t_data *data)
+{
+	uint32_t	x;
+	uint32_t	y;
+
+	y = 0;
+	while (y < (uint32_t)data->win_height)
+	{
+		x = 0;
+		while (x < (uint32_t)data->win_width)
+		{
+			mlx_put_pixel(data->image, x, y, data->texture_pixels[x][y]);
+			x++;
+		}
+		y++;
+	}
+}
+
+void	draw_game(t_data *data, t_player *player)
+{
+	raycasting(player, data);
+	draw_image(data);
+}
+</script>
+  </div>
+  <p><span class="ic">draw_game</span> = render into the buffer, then copy all 640,000 pixels into the MLX image with <span class="ic">mlx_put_pixel</span>. MLX42 displays the image automatically each loop tick.</p>
+  <div class="box warn"><span class="bt">Note the axis order</span>The buffer is indexed <span class="ic">texture_pixels[x][y]</span> (column-major), while <span class="ic">mlx_put_pixel</span> takes <span class="ic">(x, y)</span>. Keep that order straight — it's an easy place to introduce a transposed-image bug.</div>
+
+  <div class="qa-wrap">
+    <div class="qt">Defense questions</div>
+    <details class="qa"><summary>Why render to your own buffer first instead of calling mlx_put_pixel during raycasting?</summary>
+      <div class="ans">It separates "compute the frame" from "show the frame," makes the wall/floor/ceiling fill order simple per column, and means you build one complete frame then blit it once — no half-drawn frames.</div></details>
+    <details class="qa"><summary>Are the floor and ceiling textured?</summary>
+      <div class="ans">No. They're solid colors (<code>hex_floor</code>, <code>hex_ceiling</code>) parsed from the F/C lines. Only walls are textured. (Textured floor/ceiling would be a bonus feature.)</div></details>
+    <details class="qa"><summary>How many pixels are pushed per frame, and is that a concern?</summary>
+      <div class="ans">800×800 = 640,000 <code>mlx_put_pixel</code> calls. It's fine here because frames are only redrawn on input (<code>needs_redraw</code>), not continuously.</div></details>
+  </div>
+</section>
+
+<!-- ================= 10 CONTROLS ================= -->
+<section id="controls">
+  <h2><span class="num">10</span>Controls &amp; movement</h2>
+  <p class="lead">Keys move and turn the player; the loop only redraws when something changed.</p>
+
+  <h3>Key handling</h3>
+  <div class="codeblock" data-file="srcs/render/moving_n_keys.c · key_hook (l.85)">
+<script type="text/plain">
+void	key_hook(mlx_key_data_t keydata, void *param)
+{
+	t_data	*data;
+
+	data = (t_data *)param;
+	if (keydata.key == 256 && keydata.action == 1)
+	{
+		if (data && data->mlx)
+			mlx_close_window(data->mlx);
+		return ;
+	}
+	else if (keydata.key == 87 || keydata.key == 265)
+		ft_move(data, FORWARD);
+	else if (keydata.key == 83 || keydata.key == 264)
+		ft_move(data, BACKWARD);
+	else if (keydata.key == 65)
+		ft_move(data, LEFT);
+	else if (keydata.key == 68)
+		ft_move(data, RIGHT);
+	else if (keydata.key == MLX_KEY_LEFT)
+		ft_rotate(data, ROT_LEFT);
+	else if (keydata.key == MLX_KEY_RIGHT)
+		ft_rotate(data, ROT_RIGHT);
+	data->needs_redraw = true;
+}
+</script>
+  </div>
+  <table>
+    <tr><th>Key</th><th>Code</th><th>Action</th></tr>
+    <tr><td>W / ↑</td><td>87 / 265</td><td>move forward (along dir)</td></tr>
+    <tr><td>S / ↓</td><td>83 / 264</td><td>move backward</td></tr>
+    <tr><td>A</td><td>65</td><td>strafe left (along plane)</td></tr>
+    <tr><td>D</td><td>68</td><td>strafe right (along plane)</td></tr>
+    <tr><td>← / →</td><td>263 / 262</td><td>rotate the camera</td></tr>
+    <tr><td>ESC</td><td>256</td><td>close the window</td></tr>
+  </table>
+  <p><span class="ic">keydata.action == 1</span> means "key pressed" (vs released/repeat). Every handled key sets <span class="ic">needs_redraw = true</span>.</p>
+
+  <h3>Moving with collision (wall sliding)</h3>
+  <div class="codeblock" data-file="srcs/render/moving_n_keys.c · ft_move / validate_move (l.25)">
+<script type="text/plain">
+static void	validate_move(t_data *data, double new_x, double new_y)
+{
+	if (check_limit_dda(data, new_x, data->player.pos_y)
+		&& data->map[(int)data->player.pos_y][(int)new_x] == '0')
+		data->player.pos_x = new_x;
+	if (check_limit_dda(data, data->player.pos_x, new_y)
+		&& data->map[(int)new_y][(int)data->player.pos_x] == '0')
+		data->player.pos_y = new_y;
+}
+
+static void	ft_move(t_data *data, int key)
+{
+	double	new_x;
+	double	new_y;
+
+	if (key == FORWARD) {
+		new_x = data->player.pos_x + data->player.dir_x * MOVE_SPEED;
+		new_y = data->player.pos_y + data->player.dir_y * MOVE_SPEED;
+	}
+	else if (key == BACKWARD) {
+		new_x = data->player.pos_x - data->player.dir_x * MOVE_SPEED;
+		new_y = data->player.pos_y - data->player.dir_y * MOVE_SPEED;
+	}
+	else if (key == LEFT) {
+		new_x = data->player.pos_x - data->player.plane_x * MOVE_SPEED;
+		new_y = data->player.pos_y - data->player.plane_y * MOVE_SPEED;
+	}
+	else {
+		new_x = data->player.pos_x + data->player.plane_x * MOVE_SPEED;
+		new_y = data->player.pos_y + data->player.plane_y * MOVE_SPEED;
+	}
+	validate_move(data, new_x, new_y);
+}
+</script>
+  </div>
+  <div class="box key"><span class="bt">Why X and Y are validated separately</span>By checking the new X with the old Y, and the new Y with the old X, the player <b>slides along a wall</b> instead of stopping dead: if X is blocked but Y is free, you still move in Y. That's the classic FPS wall-slide.</div>
+  <div class="box warn"><span class="bt">About MOVE_SPEED = 1</span>One whole cell per key press is a large step — collision only checks the destination cell, not the path, so high speeds could in theory tunnel through a thin wall. For this grid it's acceptable, but it's a fair point to raise in defense.</div>
+
+  <h3>Rotation — a 2D rotation matrix</h3>
+  <div class="codeblock" data-file="srcs/render/moving_n_keys.c · ft_rotate (l.63)">
+<script type="text/plain">
+static void	ft_rotate(t_data *data, double rot_key)
+{
+	double	olddir_x;
+	double	oldplane_x;
+	double	rot_speed;
+
+	if (rot_key == ROT_LEFT)
+		rot_speed = ROT_LEFT;
+	else
+		rot_speed = ROT_RIGHT;
+	olddir_x = data->player.dir_x;
+	data->player.dir_x = data->player.dir_x * cos(rot_speed)
+		- data->player.dir_y * sin(rot_speed);
+	data->player.dir_y = olddir_x * sin(rot_speed)
+		+ data->player.dir_y * cos(rot_speed);
+	oldplane_x = data->player.plane_x;
+	data->player.plane_x = data->player.plane_x * cos(rot_speed)
+		- data->player.plane_y * sin(rot_speed);
+	data->player.plane_y = oldplane_x * sin(rot_speed)
+		+ data->player.plane_y * cos(rot_speed);
+}
+</script>
+  </div>
+  <div class="box def"><span class="bt">The rotation matrix</span><span class="ic">x' = x·cos θ − y·sin θ</span> and <span class="ic">y' = x·sin θ + y·cos θ</span>. Both <b>dir</b> and <b>plane</b> are rotated by the same angle so they stay perpendicular and the FOV is preserved. Note <span class="ic">olddir_x</span> is saved first because <span class="ic">dir_x</span> is overwritten before it's used in the <span class="ic">dir_y</span> line.</div>
+
+  <h3>The frame loop</h3>
+  <div class="codeblock" data-file="srcs/render/moving_n_keys.c · loop_hook (l.111)">
+<script type="text/plain">
+void	loop_hook(void *param)
+{
+	t_data	*data;
+
+	data = (t_data *)param;
+	if (data->needs_redraw)
+	{
+		draw_game(data, &data->player);
+		data->needs_redraw = false;
+	}
+}
+</script>
+  </div>
+  <p>Registered with <span class="ic">mlx_loop_hook</span>, this runs every tick but only re-renders when <span class="ic">needs_redraw</span> is set — so a still scene costs almost nothing.</p>
+
+  <div class="qa-wrap">
+    <div class="qt">Defense questions</div>
+    <details class="qa"><summary>Why move forward with <code>dir</code> but strafe with <code>plane</code>?</summary>
+      <div class="ans"><code>dir</code> points where you look, so forward/back follow it. <code>plane</code> is perpendicular to <code>dir</code>, i.e. exactly "sideways," so adding/subtracting it strafes left/right.</div></details>
+    <details class="qa"><summary>Explain the wall-sliding collision.</summary>
+      <div class="ans"><code>validate_move</code> tests the new X against the current Y, and the new Y against the current X, independently. If only one axis is blocked, the other still updates — so you slide along the wall instead of stopping.</div></details>
+    <details class="qa"><summary>Why save <code>olddir_x</code> before rotating?</summary>
+      <div class="ans">Because the new <code>dir_x</code> is computed and stored first, but the formula for the new <code>dir_y</code> still needs the <em>original</em> <code>dir_x</code>. Saving it prevents using the already-overwritten value.</div></details>
+    <details class="qa"><summary>Why gate rendering behind <code>needs_redraw</code>?</summary>
+      <div class="ans">Nothing changes between key events, so re-rendering 640k pixels every tick would waste CPU. The flag means we only redraw right after the player actually moves or turns.</div></details>
+  </div>
+</section>
+
+<!-- ================= 11 MEMORY ================= -->
+<section id="memory">
+  <h2><span class="num">11</span>Memory management &amp; MLX42 lifecycle</h2>
+  <p class="lead">One cleanup function frees everything, with guards so MLX teardown never runs twice (the source of the earlier segfaults).</p>
+
+  <div class="codeblock" data-file="srcs/utils/free_data.c · free_data (l.85)">
+<script type="text/plain">
+int	free_data(t_data *data)
+{
+	if (!data)
+		return (1);
+	if (data->image && data->mlx && !data->delete)
+	{
+		mlx_delete_image(data->mlx, data->image);
+		data->image = NULL;
+		data->delete = true;
+	}
+	if (data->mlx && !data->close)
+	{
+		mlx_close_window(data->mlx);
+		data->close = true;
+	}
+	if (data->mlx && !data->terminate)
+	{
+		mlx_terminate(data->mlx);
+		data->mlx = NULL;
+		data->terminate = true;
+	}
+	free_map(data);
+	free_texinfo(&data->texrgbinfo);
+	free_texture_pixels(data);
+	free(data);
+	return (1);
+}
+</script>
+  </div>
+  <div class="box key"><span class="bt">The three boolean guards</span><span class="ic">delete</span>, <span class="ic">close</span>, <span class="ic">terminate</span> ensure each MLX teardown happens at most once. Cleanup can be triggered from several places (parse failure, ESC, window close, normal exit), so without the guards you'd risk a double <span class="ic">mlx_terminate</span> → crash. <b>Order matters</b>: delete image → close window → terminate context.</div>
+
+  <p><span class="ic">free_data</span> always returns 1 — that's deliberate, so <span class="ic">parsing</span> can write <span class="ic">return (free_data(data));</span> and propagate "failure" in one line.</p>
+
+  <div class="codeblock" data-file="srcs/utils/free_data.c · free_texinfo (l.45)">
+<script type="text/plain">
+void	free_texinfo(t_texrgbinfo *textures)
+{
+	int	i;
+
+	i = -1;
+	if (textures->north)
+		free(textures->north);
+	if (textures->south)
+		free(textures->south);
+	if (textures->west)
+		free(textures->west);
+	if (textures->east)
+		free(textures->east);
+	if (textures->ceiling)
+		free(textures->ceiling);
+	if (textures->floor)
+		free(textures->floor);
+	while (++i < 4)
+	{
+		if (textures->tex[i])
+			mlx_delete_texture(textures->tex[i]);
+	}
+}
+</script>
+  </div>
+  <div class="box warn"><span class="bt">What the "fix segfault" commit changed</span>The texture array is freed with a <b>fixed bound</b> <span class="ic">while (++i &lt; 4)</span> and a <span class="ic">NULL</span> check, instead of looping until a NULL terminator that may not exist. Also note <span class="ic">free_map</span> does <span class="ic">data->path = NULL;</span> without freeing — because <span class="ic">path</span> points at <span class="ic">argv[1]</span>, which you must never free.</div>
+
+  <p>MLX42 is the modern <b>MiniLibX rewrite</b> (OpenGL + GLFW, cross-platform). Lifecycle used here: <span class="ic">mlx_init</span> → <span class="ic">mlx_new_image</span> → <span class="ic">mlx_image_to_window</span> → register hooks → <span class="ic">mlx_loop</span> (blocks) → on exit, <span class="ic">free_data</span> tears it all down.</p>
+
+  <div class="qa-wrap">
+    <div class="qt">Defense questions</div>
+    <details class="qa"><summary>Why does <code>free_data</code> use boolean flags?</summary>
+      <div class="ans">Cleanup can be reached from multiple paths (errors, ESC, window close, end of loop). The <code>delete/close/terminate</code> flags make each MLX teardown idempotent, preventing double-free / double-terminate crashes.</div></details>
+    <details class="qa"><summary>Why is <code>path</code> set to NULL but never freed?</summary>
+      <div class="ans">It points to <code>argv[1]</code>, owned by the OS, not heap-allocated by us. Freeing it would be undefined behavior; we just drop the pointer.</div></details>
+    <details class="qa"><summary>Why does <code>free_data</code> return 1?</summary>
+      <div class="ans">So callers can do <code>return (free_data(data));</code> to both clean up and signal failure in a single statement, matching the "1 = failure" convention.</div></details>
+    <details class="qa"><summary>In what order must MLX resources be released, and why?</summary>
+      <div class="ans">Image first, then window, then terminate the context. The image belongs to the context/window, so destroying the context before the image it owns can crash or leak.</div></details>
+  </div>
+</section>
+
+<!-- ================= 12 BUILD ================= -->
+<section id="build">
+  <h2><span class="num">12</span>Makefile &amp; building</h2>
+  <p class="lead">How the three pieces — your code, libft, and MLX42 — are compiled and linked.</p>
+
+  <div class="codeblock" data-file="Makefile (key parts)">
+<script type="text/plain">
+NAME    = cub3D
+CC      = cc
+CFLAGS  = -Wall -Wextra -Werror -g
+HEADERS = -I ${MLX_DIR}/include -I ${LIBFT_DIR}
+LIBS    = ${MLX_DIR}/build/libmlx42.a ${LIBFT_DIR}/libft.a -pthread -lm -lglfw
+
+all: mlx libft ${NAME} ${OBJ_DIR}
+
+${NAME}: ${OBJS}
+	${CC} ${CFLAGS} ${OBJS} ${LIBS} -o $@
+
+$(OBJ_DIR)%.o: $(SRCS_DIR)%.c
+	@mkdir -p $(dir $@)
+	${CC} ${CFLAGS} ${HEADERS} -c $< -o $@
+
+libft:
+	@make -C ${LIBFT_DIR}
+
+mlx:
+	@cmake -S ${MLX_DIR} -B ${MLX_DIR}/build
+	@cmake --build ${MLX_DIR}/build -j4
+
+leaks:
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes \
+	--suppressions=mlx.supp -s ./cub3D maps/valid/hard.cub
+</script>
+  </div>
+  <ul>
+    <li><b>Flags</b>: <span class="ic">-Wall -Wextra -Werror</span> (42 mandatory) plus <span class="ic">-g</span> for debugging.</li>
+    <li><b>MLX42 is built with CMake</b> (it's a CMake project, unlike old MiniLibX), producing <span class="ic">libmlx42.a</span>.</li>
+    <li><b>libft</b> is built with its own <span class="ic">make</span>.</li>
+    <li><b>Link line</b>: your objects + <span class="ic">libmlx42.a</span> + <span class="ic">libft.a</span>, plus <span class="ic">-pthread</span> (MLX42 threads), <span class="ic">-lm</span> (sin/cos/fabs/floor), and <span class="ic">-lglfw</span> (windowing backend).</li>
+    <li><b>make leaks</b>: runs valgrind with <span class="ic">mlx.supp</span> to hide known GPU/driver leaks and focus on your code.</li>
+  </ul>
+
+  <div class="box def"><span class="bt">Run it</span><span class="ic">make</span> then <span class="ic">./cub3D maps/valid/easy.cub</span>. Move with WASD, turn with ← →, quit with ESC.</div>
+
+  <div class="qa-wrap">
+    <div class="qt">Defense questions</div>
+    <details class="qa"><summary>Why do you link <code>-lm</code> and <code>-lglfw</code>?</summary>
+      <div class="ans"><code>-lm</code> provides the math functions (<code>sin</code>, <code>cos</code>, <code>fabs</code>, <code>floor</code>) used in rotation and projection. <code>-lglfw</code> is the window/input backend MLX42 sits on top of; <code>-pthread</code> covers its threading.</div></details>
+    <details class="qa"><summary>How is MLX42 different from the old MiniLibX, build-wise?</summary>
+      <div class="ans">MLX42 is a modern OpenGL/GLFW rewrite and ships as a CMake project, so the Makefile invokes <code>cmake</code> to produce <code>libmlx42.a</code> rather than a plain <code>make</code>.</div></details>
+    <details class="qa"><summary>What is <code>mlx.supp</code> for?</summary>
+      <div class="ans">A valgrind suppression file that silences leaks coming from the graphics stack (GLFW/OpenGL/drivers) which aren't yours, so <code>make leaks</code> reports only leaks in the project's own code.</div></details>
+  </div>
+</section>
+
+<!-- ================= CHEAT SHEET ================= -->
+<section id="cheatsheet">
+  <h2><span class="num">★</span>One-page cheat sheet</h2>
+  <p class="lead">The formulas and facts most likely to be asked.</p>
+  <table>
+    <tr><th>Concept</th><th>Formula / fact</th><th>Where</th></tr>
+    <tr><td>Column → camera space</td><td><code>camera_x = 2x / WIN_WIDTH − 1</code></td><td>init_data.c:69</td></tr>
+    <tr><td>Ray direction</td><td><code>ray = dir + plane · camera_x</code></td><td>init_data.c:70</td></tr>
+    <tr><td>Delta distance</td><td><code>deltadist = |1 / ray|</code></td><td>init_data.c:74</td></tr>
+    <tr><td>DDA step</td><td>advance the smaller sidedist, move one cell</td><td>raycasting.c:73</td></tr>
+    <tr><td>Perp distance (no fisheye)</td><td><code>distwall = sidedist − deltadist</code></td><td>raycasting.c:51</td></tr>
+    <tr><td>Wall height</td><td><code>line_height = WIN_HEIGHT / distwall</code></td><td>raycasting.c:57</td></tr>
+    <tr><td>Slice placement</td><td><code>start = H/2 − lh/2</code>, <code>end = H/2 + lh/2</code></td><td>raycasting.c:60</td></tr>
+    <tr><td>Texture X</td><td><code>pos_on_wall · tex_width</code> (+ flip)</td><td>raycasting.c:30</td></tr>
+    <tr><td>Texture step</td><td><code>step = tex_height / line_height</code></td><td>raycasting.c:34</td></tr>
+    <tr><td>Color packing</td><td><code>(R&lt;&lt;24)|(G&lt;&lt;16)|(B&lt;&lt;8)|A</code></td><td>raycasting.c:20</td></tr>
+    <tr><td>Rotation matrix</td><td><code>x'=x·cosθ−y·sinθ ; y'=x·sinθ+y·cosθ</code></td><td>moving_n_keys.c:73</td></tr>
+    <tr><td>FOV</td><td><code>2·atan(|plane|/|dir|) ≈ 60°</code> (plane 0.6)</td><td>prep_game.c:21</td></tr>
+    <tr><td>Side → texture</td><td>side0 ⇒ E/W (sign of ray_x); side1 ⇒ N/S (ray_y)</td><td>utils.c:24</td></tr>
+  </table>
+
+  <div class="box bug"><span class="bt">Known issues to mention proactively</span>
+    <ul style="margin:6px 0 0">
+      <li><b>Closure check doesn't reject open maps</b> — <span class="ic">check_closure</span> returns 0 even on a hole (check_map_closure.c:57).</li>
+      <li><b>MOVE_SPEED = 1</b> (a full cell/press) only checks the destination cell, so fast moves could tunnel thin walls.</li>
+      <li><b>Error text goes to stdout</b> — <span class="ic">print_err_msg</span> writes to fd 1, whereas errors conventionally go to fd 2 (stderr).</li>
+    </ul>
+  </div>
+
+  <div class="foot">
+    Built from your actual source on 2026-06-07 · all references point at real <span class="mono">file:line</span> locations.<br>
+    <span class="pill">Tip</span> Open the file, read each chapter, then close the laptop and re-explain the diagram out loud — that's how you pass the defense.
+  </div>
+</section>
+
+</main>
+
+<script>
+/* ============================================================
+   1. C syntax highlighter + code block renderer
+   ============================================================ */
+(function () {
+  function escapeHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+  function dedent(src){
+    var lines = src.replace(/^\n+/,'').replace(/\s+$/,'').split('\n');
+    var min = Infinity;
+    lines.forEach(function(l){
+      if(!l.trim()) return;
+      var m = l.match(/^[ \t]*/)[0].length;
+      if(m < min) min = m;
+    });
+    if(min === Infinity) min = 0;
+    return lines.map(function(l){return l.slice(min);}).join('\n');
+  }
+
+  function highlight(code){
+    code = escapeHtml(code);
+    var store = [];
+    function stash(html){ store.push(html); return 'Z' + (store.length-1) + ''; }
+    // comments
+    code = code.replace(/\/\*[\s\S]*?\*\//g, function(m){return stash('<span class="c-com">'+m+'</span>');});
+    code = code.replace(/\/\/[^\n]*/g, function(m){return stash('<span class="c-com">'+m+'</span>');});
+    // strings & chars
+    code = code.replace(/"(?:[^"\\]|\\.)*"/g, function(m){return stash('<span class="c-str">'+m+'</span>');});
+    code = code.replace(/'(?:[^'\\]|\\.)'/g, function(m){return stash('<span class="c-str">'+m+'</span>');});
+    // preprocessor lines
+    code = code.replace(/^[ \t]*#[^\n]*/gm, function(m){return stash('<span class="c-pre">'+m+'</span>');});
+    // numbers
+    code = code.replace(/\b(0x[0-9a-fA-F]+|\d+\.?\d*)\b/g, '<span class="c-num">$1</span>');
+    // types
+    var types = ['t_data','t_ray','t_player','t_texrgbinfo','t_line','mlx_t','mlx_image_t','mlx_texture_t','mlx_key_data_t','uint8_t','uint32_t','size_t','int','char','double','void','bool','struct','unsigned'];
+    code = code.replace(new RegExp('\\b('+types.join('|')+')\\b','g'), '<span class="c-type">$1</span>');
+    // keywords
+    var kw = ['if','else','while','for','return','break','continue','static','typedef','sizeof','true','false','NULL'];
+    code = code.replace(new RegExp('\\b('+kw.join('|')+')\\b','g'), '<span class="c-kw">$1</span>');
+    // function calls
+    code = code.replace(/\b([a-zA-Z_]\w*)\s*(?=\()/g, '<span class="c-fn">$1</span>');
+    // restore stashed pieces
+    code = code.replace(/Z(\d+)/g, function(m,i){return store[+i];});
+    return code;
+  }
+
+  document.querySelectorAll('.codeblock').forEach(function(block){
+    var raw = block.querySelector('script[type="text/plain"]');
+    if(!raw) return;
+    var src = dedent(raw.textContent);
+    var file = block.getAttribute('data-file') || '';
+    block.innerHTML =
+      '<div class="cb-head"><span class="file">'+escapeHtml(file)+'</span><span class="dot">C</span></div>' +
+      '<pre><code>'+highlight(src)+'</code></pre>';
+  });
+})();
+
+/* ============================================================
+   2. Scroll-spy for the sidebar TOC
+   ============================================================ */
+(function () {
+  var links = Array.prototype.slice.call(document.querySelectorAll('#toc a'));
+  var map = {};
+  links.forEach(function(a){ map[a.getAttribute('href').slice(1)] = a; });
+  var sections = Array.prototype.slice.call(document.querySelectorAll('section[id]'));
+  var obs = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        links.forEach(function(l){l.classList.remove('active');});
+        if(map[e.target.id]) map[e.target.id].classList.add('active');
+      }
+    });
+  }, {rootMargin:'-45% 0px -50% 0px', threshold:0});
+  sections.forEach(function(s){obs.observe(s);});
+})();
+
+/* ============================================================
+   3. Shared mini map + DDA (used by raycasting & fisheye demos)
+   ============================================================ */
+var MAP = [
+  "11111111",
+  "10000001",
+  "10011001",
+  "10000001",
+  "10000001",
+  "10010001",
+  "10000001",
+  "11111111"
+];
+function cell(mx,my){
+  if(my<0||my>=MAP.length) return '1';
+  if(mx<0||mx>=MAP[my].length) return '1';
+  return MAP[my][mx];
+}
+// returns {perp, eucl, side, hx, hy} for a ray from (px,py) dir (rdx,rdy)
+function castRay(px,py,rdx,rdy){
+  var mapX=Math.floor(px), mapY=Math.floor(py);
+  var ddx=Math.abs(1/rdx), ddy=Math.abs(1/rdy);
+  var stepX,stepY,sdx,sdy;
+  if(rdx<0){stepX=-1; sdx=(px-mapX)*ddx;} else {stepX=1; sdx=(mapX+1-px)*ddx;}
+  if(rdy<0){stepY=-1; sdy=(py-mapY)*ddy;} else {stepY=1; sdy=(mapY+1-py)*ddy;}
+  var side=0, hit=false, guard=0;
+  while(!hit && guard++<64){
+    if(sdx<sdy){ sdx+=ddx; mapX+=stepX; side=0; }
+    else { sdy+=ddy; mapY+=stepY; side=1; }
+    if(cell(mapX,mapY)==='1') hit=true;
+  }
+  var perp = (side===0) ? (sdx-ddx) : (sdy-ddy);
+  if(perp<0.0001) perp=0.0001;
+  var hx=px+rdx*perp, hy=py+rdy*perp;
+  var eucl=Math.sqrt((hx-px)*(hx-px)+(hy-py)*(hy-py));
+  return {perp:perp, eucl:eucl, side:side, hx:hx, hy:hy};
+}
+
+/* ============================================================
+   4. Demo: raycaster (top-down + 3D view)
+   ============================================================ */
+(function () {
+  var top=document.getElementById('ray-top'), view=document.getElementById('ray-view');
+  if(!top) return;
+  var tc=top.getContext('2d'), vc=view.getContext('2d');
+  var px=document.getElementById('ray-px'), py=document.getElementById('ray-py'), ang=document.getElementById('ray-ang');
+  var read=document.getElementById('ray-read');
+  var NRAYS=80, PLANE=0.66;
+  function draw(){
+    var pX=+px.value, pY=+py.value, a=+ang.value*Math.PI/180;
+    var dirx=Math.cos(a), diry=Math.sin(a);
+    var planex=-diry*PLANE, planey=dirx*PLANE;
+    var cs=top.width/8;
+    // top-down grid
+    tc.clearRect(0,0,top.width,top.height);
+    for(var y=0;y<8;y++)for(var x=0;x<8;x++){
+      tc.fillStyle = MAP[y][x]==='1' ? '#1d4e7a' : '#0c1118';
+      tc.fillRect(x*cs,y*cs,cs-1,cs-1);
+    }
+    // 3D view background
+    vc.fillStyle='#101826'; vc.fillRect(0,0,view.width,view.height/2);
+    vc.fillStyle='#15110d'; vc.fillRect(0,view.height/2,view.width,view.height/2);
+    var colW=view.width/NRAYS;
+    for(var i=0;i<NRAYS;i++){
+      var cam=2*i/NRAYS-1;
+      var rdx=dirx+planex*cam, rdy=diry+planey*cam;
+      var r=castRay(pX,pY,rdx,rdy);
+      // ray on top-down
+      tc.strokeStyle='rgba(126,231,135,0.25)'; tc.beginPath();
+      tc.moveTo(pX*cs,pY*cs); tc.lineTo(r.hx*cs,r.hy*cs); tc.stroke();
+      // column in 3D view
+      var lh=view.height/r.perp;
+      var start=Math.max(0,view.height/2-lh/2), end=Math.min(view.height,view.height/2+lh/2);
+      var shade=r.side===1?0.62:1.0;
+      var c=Math.max(40,Math.min(255,Math.round(255/ (0.5+r.perp*0.5))));
+      vc.fillStyle='rgba('+Math.round(70*shade)+','+Math.round(150*shade)+','+Math.round(c*shade)+',1)';
+      vc.fillRect(i*colW,start,colW+1,end-start);
+    }
+    // player
+    tc.fillStyle='#f2cc60'; tc.beginPath(); tc.arc(pX*cs,pY*cs,4,0,7); tc.fill();
+    tc.strokeStyle='#f2cc60'; tc.beginPath(); tc.moveTo(pX*cs,pY*cs);
+    tc.lineTo((pX+dirx*0.7)*cs,(pY+diry*0.7)*cs); tc.stroke();
+    document.getElementById('ray-px-v').textContent=pX.toFixed(2);
+    document.getElementById('ray-py-v').textContent=pY.toFixed(2);
+    document.getElementById('ray-ang-v').textContent=ang.value+'°';
+    var mid=castRay(pX,pY,dirx,diry);
+    read.textContent='center ray:\n  perp dist = '+mid.perp.toFixed(3)+'\n  hit side  = '+(mid.side===0?'X (E/W)':'Y (N/S)')+'\n  line_height = '+Math.round(view.height/mid.perp);
+  }
+  [px,py,ang].forEach(function(el){el.addEventListener('input',draw);});
+  draw();
+})();
+
+/* ============================================================
+   5. Demo: camera = dir + plane (FOV fan)
+   ============================================================ */
+(function () {
+  var cv=document.getElementById('cam-canvas'); if(!cv) return;
+  var ctx=cv.getContext('2d');
+  var ang=document.getElementById('cam-ang'), pl=document.getElementById('cam-plane');
+  var read=document.getElementById('cam-read');
+  function draw(){
+    var W=cv.width,H=cv.height,ox=W/2,oy=H/2,S=90;
+    ctx.clearRect(0,0,W,H);
+    // grid cross
+    ctx.strokeStyle='#1c2330'; ctx.beginPath();
+    ctx.moveTo(0,oy);ctx.lineTo(W,oy);ctx.moveTo(ox,0);ctx.lineTo(ox,H);ctx.stroke();
+    var a=+ang.value*Math.PI/180, plen=+pl.value/100;
+    var dirx=Math.cos(a), diry=Math.sin(a);
+    var planex=-diry*plen, planey=dirx*plen;
+    // rays fan
+    for(var i=0;i<=16;i++){
+      var cam=2*i/16-1;
+      var rx=dirx+planex*cam, ry=diry+planey*cam;
+      ctx.strokeStyle='rgba(210,168,255,0.45)'; ctx.beginPath();
+      ctx.moveTo(ox,oy); ctx.lineTo(ox+rx*S, oy+ry*S); ctx.stroke();
+    }
+    // plane segment (dir tip ± plane)
+    ctx.strokeStyle='#ffa657'; ctx.lineWidth=2; ctx.beginPath();
+    ctx.moveTo(ox+(dirx-planex)*S, oy+(diry-planey)*S);
+    ctx.lineTo(ox+(dirx+planex)*S, oy+(diry+planey)*S); ctx.stroke();
+    // dir
+    ctx.strokeStyle='#7ee787'; ctx.beginPath(); ctx.moveTo(ox,oy); ctx.lineTo(ox+dirx*S,oy+diry*S); ctx.stroke();
+    ctx.lineWidth=1;
+    ctx.fillStyle='#f2cc60'; ctx.beginPath(); ctx.arc(ox,oy,4,0,7); ctx.fill();
+    var fov=2*Math.atan(plen)*180/Math.PI;
+    document.getElementById('cam-ang-v').textContent=ang.value+'°';
+    document.getElementById('cam-plane-v').textContent=plen.toFixed(2);
+    read.textContent='dir   = ('+dirx.toFixed(2)+', '+diry.toFixed(2)+')\nplane = ('+planex.toFixed(2)+', '+planey.toFixed(2)+')\nFOV   = '+fov.toFixed(1)+'°\n(dir · plane = '+(dirx*planex+diry*planey).toFixed(2)+'  → perpendicular)';
+  }
+  [ang,pl].forEach(function(el){el.addEventListener('input',draw);});
+  draw();
+})();
+
+/* ============================================================
+   6. Demo: fisheye (perp vs euclidean)
+   ============================================================ */
+(function () {
+  var cv=document.getElementById('fish-canvas'); if(!cv) return;
+  var ctx=cv.getContext('2d');
+  var dEl=document.getElementById('fish-d'), fixEl=document.getElementById('fish-fix');
+  var read=document.getElementById('fish-read');
+  function draw(){
+    var W=cv.width,H=cv.height;
+    ctx.fillStyle='#101826'; ctx.fillRect(0,0,W,H/2);
+    ctx.fillStyle='#15110d'; ctx.fillRect(0,H/2,W,H/2);
+    var D=+dEl.value, fix=fixEl.checked, PLANE=0.66, N=W;
+    var dirx=0, diry=-1, planex=PLANE, planey=0;
+    // flat wall at y = py - D ; player at (0.5? ) use coordinate system: player at origin looking up
+    var px=0, py=0; // player
+    var wallY=-D;   // wall straight ahead
+    var minH=999,maxH=0;
+    for(var i=0;i<N;i++){
+      var cam=2*i/N-1;
+      var rx=dirx+planex*cam, ry=diry+planey*cam;
+      // intersect ray with horizontal line y=wallY: t such that py+ry*t = wallY
+      var t=(wallY-py)/ry;
+      var hx=px+rx*t;
+      var eucl=Math.sqrt((hx-px)*(hx-px)+(wallY-py)*(wallY-py));
+      var perp=D; // perpendicular distance to a wall straight ahead is constant = D
+      var dist=fix?perp:eucl;
+      var lh=(H*0.8)/dist;
+      if(lh<minH)minH=lh; if(lh>maxH)maxH=lh;
+      var start=H/2-lh/2;
+      ctx.fillStyle = fix? '#4690d0' : '#d06a46';
+      ctx.fillRect(i,start,1,lh);
+    }
+    read.textContent=(fix?'PERPENDICULAR (fix ON)':'EUCLIDEAN (fix OFF)')
+      +'\nwall is flat & straight ahead\nslice height  center='+Math.round(maxH)+'  edge='+Math.round(minH)
+      +'\n'+(fix?'→ flat wall stays flat ✔':'→ wall bulges = fish-eye ✘');
+  }
+  [dEl,fixEl].forEach(function(el){el.addEventListener('input',draw);});
+  draw();
+})();
+
+/* ============================================================
+   7. Demo: texture column sampling
+   ============================================================ */
+(function () {
+  var src=document.getElementById('tex-src'), out=document.getElementById('tex-out'); if(!src) return;
+  var sc=src.getContext('2d'), oc=out.getContext('2d');
+  var posEl=document.getElementById('tex-pos'), hEl=document.getElementById('tex-h');
+  var read=document.getElementById('tex-read');
+  var TW=8, TH=8; // logical texture 8x8
+  // build a simple brick-ish texture
+  var tex=[];
+  for(var y=0;y<TH;y++){ tex[y]=[]; for(var x=0;x<TW;x++){
+    var brick = ((y%4===0) || ((x+(Math.floor(y/4)%2)*2)%4===0));
+    tex[y][x]= brick? [40,44,52] : [170,90,60];
+  }}
+  function draw(){
+    var pos=+posEl.value, lh=+hEl.value;
+    var scale=src.width/TW;
+    // draw source texture
+    for(var y=0;y<TH;y++)for(var x=0;x<TW;x++){
+      var c=tex[y][x]; sc.fillStyle='rgb('+c[0]+','+c[1]+','+c[2]+')';
+      sc.fillRect(x*scale,y*scale,scale,scale);
+    }
+    var texX=Math.min(TW-1,Math.floor(pos*TW));
+    // highlight chosen column
+    sc.strokeStyle='#7ee787'; sc.lineWidth=3;
+    sc.strokeRect(texX*scale+1,1,scale-2,src.height-2);
+    sc.lineWidth=1;
+    // draw output column: sample with step = TH/lh
+    oc.clearRect(0,0,out.width,out.height);
+    var step=TH/lh;
+    var start=Math.max(0, out.height/2 - lh/2);
+    var end=Math.min(out.height, out.height/2 + lh/2);
+    var texPos=(start - out.height/2 + lh/2)*step;
+    for(var sy=Math.floor(start); sy<end; sy++){
+      var ty=Math.floor(texPos) & (TH-1); texPos+=step;
+      var c2=tex[ty][texX];
+      oc.fillStyle='rgb('+c2[0]+','+c2[1]+','+c2[2]+')';
+      oc.fillRect(0,sy,out.width,1);
+    }
+    document.getElementById('tex-pos-v').textContent=pos.toFixed(2)+' → col '+texX;
+    document.getElementById('tex-h-v').textContent=lh+'px';
+    read.textContent='texX = floor(pos·width) = '+texX+'\nstep = tex_h/line_h = '+(TH/lh).toFixed(3)+'\n'+(lh>out.height?'(slice taller than screen → cropped)':'');
+  }
+  [posEl,hEl].forEach(function(el){el.addEventListener('input',draw);});
+  draw();
+})();
+</script>
+</body>
+</html>

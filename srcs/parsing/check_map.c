@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   check_map.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: Nikita_Kuydin <nikitakuydin@qmail.com>     #+#  +:+       +#+        */
+/*   By: mateon <mateon@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026-05-07 15:05:14 by Nikita_Kuydin     #+#    #+#             */
-/*   Updated: 2026-05-07 15:05:14 by Nikita_Kuydin    ###   ########.fr       */
+/*   Created: 2026/05/07 15:05:14 by Nikita_Kuyd       #+#    #+#             */
+/*   Updated: 2026/06/10 17:12:24 by mateon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,9 @@ static int	check_cell(t_data *data, char **map, int i, int j)
 	}
 	return (0);
 }
+// should we accept tab too ?
+// if yes well you need to put your tab to 8 spaces
+// because the compiler will read it as 8 spaces even if you put it to 4
 
 static int	check_elements(t_data *data, char **map)
 {
