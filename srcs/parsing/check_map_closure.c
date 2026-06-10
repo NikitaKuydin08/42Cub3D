@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   check_map_closure.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: Nikita_Kuydin <nikitakuydin@qmail.com>     #+#  +:+       +#+        */
+/*   By: nkuydin <nkuydin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026-05-11 09:40:52 by Nikita_Kuydin     #+#    #+#             */
-/*   Updated: 2026-05-11 09:40:52 by Nikita_Kuydin    ###   ########.fr       */
+/*   Created: 2026/05/11 09:40:52 by Nikita_Kuyd       #+#    #+#             */
+/*   Updated: 2026/06/10 16:14:01 by nkuydin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ int	check_closure(t_data *data, char **map)
 		{
 			if (ft_strchr("0NSEW", map[i][j])
 				&& check_neighbor(data, i, j))
-				return (0);
+				return (1);
 			j++;
 		}
 		i++;
