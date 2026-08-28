@@ -1,62 +1,82 @@
-*This project has been created as part of the 42 curriculum by nkuydin, matnusko.*
-
 # cub3D
 
-## Installation Insctructions
+> A small 3D maze engine in C, inspired by *Wolfenstein 3D*. It reads a 2D text map and uses raycasting to render a first-person, textured 3D view of it in real time.
 
-### macOS prerequisite
+![language](https://img.shields.io/badge/language-C-blue) ![mlx42](https://img.shields.io/badge/graphics-MLX42-orange)
 
-GLFW is required to build MLX42. On macOS, install it through Homebrew:
+---
 
-```sh
-brew install glfw
-```
+## Table of Contents
 
-### MLX42
+- [Overview](#overview)
+- [How Raycasting Works Here](#how-raycasting-works-here)
+- [Flow Chart](#flow-chart)
+- [The `.cub` Map Format](#the-cub-map-format)
+- [Controls](#controls)
+- [Project Structure](#project-structure)
+- [Getting Started](#getting-started)
+- [Example Usage](#example-usage)
+- [Status / Roadmap](#status--roadmap)
+- [AI Usage](#ai-usage)
+- [Resources](#resources)
 
-This project depends on [MLX42](https://github.com/codam-coding-college/MLX42), a simple cross-platform graphics library built on top of GLFW. Follow the official installation guide to set it up:
+---
 
-[MLX42 — Installation](https://github.com/codam-coding-college/MLX42#installation-%EF%B8%8F)
+## Overview
 
- - git clone https://github.com/codam-coding-college/MLX42.git
- - cd MLX42
- - cmake -B build # build here refers to the outputfolder.
- - cmake --build build -j4 # or do make -C build -j4
+You give the program a `.cub` file describing a maze: wall textures, floor/ceiling colors, and a grid of walls and open space with a starting position. The program opens a window, drops you into the maze from that starting point, and lets you walk around and look at the textured walls — one vertical strip of pixels at a time, the same way the original Wolfenstein 3D did it, just without the 1992 hardware constraints.
 
-### Build
+Before any of that happens, the map file goes through a fairly strict parser: wrong extension, missing textures, malformed colors, holes in the walls, an unreachable player, tabs instead of spaces — all of it gets caught and reported before a window ever opens.
 
-Once GLFW is installed and MLX42 is in place, build the project with:
+---
 
-```sh
-make
-```
+## How Raycasting Works Here
 
-### Usage
+The core idea: for every vertical strip of pixels on screen, fire one ray from the player's position in a slightly different direction, see how far it travels before hitting a wall, and draw a wall slice whose height depends on that distance — closer wall, taller slice.
 
-```sh
-./cub3d <path/to/map.cub>
+A few specifics from this implementation:
+
+- **Player direction** is a vector (`dir_x`, `dir_y`), and there's a second **camera plane** vector perpendicular to it that defines the field of view. Rotating the player rotates both vectors using a standard 2D rotation matrix.
+- **One ray per screen column.** With an 800px-wide window, that's 800 rays per frame, each offset slightly across the camera plane.
+- **DDA (Digital Differential Analysis)** steps each ray one grid cell at a time — never checking sub-cell positions — until it lands on a `1` in the map grid. This is what `do_dda()` does: it compares how far the ray has to travel to cross the next vertical grid line vs. the next horizontal one, and steps in whichever direction is closer.
+- **Fisheye correction.** A naive ray-to-wall distance produces a warped, "bulging" view, because rays at the edge of the FOV are naturally longer. Using the *perpendicular* distance from the camera plane (rather than the raw Euclidean ray length) removes that distortion.
+- **Texture mapping.** Once a ray hits a wall, `pos_on_wall` (where exactly on that wall face it hit, from 0 to 1) picks out a texture column, and the wall slice is drawn by sampling that column of the appropriate PNG (`north`/`south`/`east`/`west`, chosen from which side of the wall the ray hit).
+
+---
+
+## Flow Chart
+
+```mermaid
+graph TD
+
+Main["main()\nvalidate argc, ft_calloc t_data"] --> Parse["parsing()"]
+
+Parse --> CheckFile["check_file\n.cub extension, regular, readable"]
+CheckFile --> Copy["map_copy_into_file\nread file into data->file"]
+Copy --> Extract["extract_data_from_file\nsplit header (NO/SO/WE/EA, F, C) from map grid"]
+Extract --> CheckTex["check_textures\nvalid PNG paths, valid RGB triplets"]
+CheckTex --> CheckMap["check_map\nvalid chars, exactly one player, row_lengths"]
+CheckMap --> Closure["check_closure\nper-cell neighbor check: every 0/N/S/E/W\nmust have non-space on all 4 sides"]
+
+Closure -->|"any check fails"| ErrorOut["print error, free_data, exit"]
+Closure -->|"map valid"| StartGame["start_game()"]
+
+StartGame --> PrepGame["prep_game\nplayer spawn pos, load wall textures,\nallocate texture_pixels buffer"]
+PrepGame --> InitWin["mlx_init + mlx_new_image\ncreate window + image, attach to window"]
+InitWin --> FirstDraw["draw_game\nfirst frame"]
+FirstDraw --> Loop["mlx_loop\n(MLX42 event loop)"]
+
+Loop --> KeyHook["key_hook\nWASD move, arrows rotate, ESC quits"]
+KeyHook -->|"sets needs_redraw"| LoopHook["loop_hook"]
+LoopHook -->|"needs_redraw"| DrawGame["draw_game → raycasting()\n800 rays, one per screen column"]
+DrawGame --> Loop
+KeyHook -->|"ESC"| CloseWin["mlx_close_window"]
+CloseWin --> FreeData["free_data\nclose window, free maps/textures"]
 ```
 
 ---
 
-## Description
-
-**cub3D** is a 42 school project inspired by the legendary *Wolfenstein 3D* — the game that pioneered the first-person shooter genre back in 1992. The goal is to build a small graphical engine in C that renders a 3D-looking maze from a 2D map description, using the **raycasting** technique.
-
-Starting from a plain text file describing walls, floor, ceiling, textures and the player's spawn position, the program opens a window and immerses the player inside the maze. From there you can walk around, look at the textured walls, and explore — all rendered one vertical strip of pixels at a time, the same way id Software did it more than thirty years ago.
-
-### Features
-
-- Parsing of `.cub` map files with validation of map shape, characters, textures and colors
-- Raycasting renderer producing a 3D perspective from a 2D grid
-- Differently textured walls depending on their orientation (North, South, East, West)
-- Configurable floor and ceiling colors
-- Smooth player movement (`W`, `A`, `S`, `D`) and camera rotation (arrow keys)
-- Clean window management — closing via the cross or `ESC` exits gracefully
-
-### The `.cub` map format
-
-A map file describes the scene through a small set of identifiers followed by the map grid itself:
+## The `.cub` Map Format
 
 ```
 NO ./textures/north.png
@@ -67,10 +87,10 @@ EA ./textures/east.png
 F 220,100,0
 C 225,30,0
 
-	1111111111111111
-	1000000000000001
-	1011000001110001
-	1001000000000001
+    1111111111111111
+    1000000000000001
+    1011000001110001
+    1001000000000001
 1111111111011000001110001
 100000000011000000010001
 101111111111111111110000001
@@ -79,97 +99,128 @@ C 225,30,0
 11111111
 ```
 
-- `NO`, `SO`, `WE`, `EA` — paths to the wall textures for each cardinal direction
-- `F` and `C` — floor and ceiling colors as RGB triplets
-- `0` walkable space, `1` wall, `N`/`S`/`E`/`W` player spawn and starting orientation
+- `NO` / `SO` / `WE` / `EA` — PNG texture paths for the four wall orientations
+- `F` / `C` — floor / ceiling color as an `R,G,B` triplet (0–255 each)
+- Map grid: `0` open space, `1` wall, and exactly one of `N`/`S`/`E`/`W` marking the player's start position and facing direction
+- Rows don't all need to be the same length — the parser tracks each row's real length separately (`row_lengths`) rather than assuming a rectangle
+- Every open cell must be enclosed by walls on all four sides, or the map is rejected as having a hole
 
-### Controls
+---
 
-| Key       | Action          |
-|-----------|-----------------|
-| `W`       | Move forward    |
-| `S`       | Move backward   |
-| `A`       | Strafe left     |
-| `D`       | Strafe right    |
-| `←` / `→` | Rotate camera   |
-| `ESC`     | Quit            |
+## Controls
 
-## Main Concepts
+| Key            | Action         |
+|----------------|----------------|
+| `W` / `↑`      | Move forward   |
+| `S` / `↓`      | Move backward  |
+| `A`            | Strafe left    |
+| `D`            | Strafe right   |
+| `←` / `→`      | Rotate camera  |
+| `ESC` / window close | Quit    |
 
-**"See kids, this is why you need to learn Pythagoras and trig at school. Those normal vectors won't calculate themselves ;-)"**
+---
 
-Vector describes how much of something there is and where it is going. Vector is used for representing the direction the player is currently facing. A vector in 2D coordinate system are usually considered to be X and Y components. V = (Vx, Vy);
+## Project Structure
 
-RayCasting - technique that transform a limited form of data into a 3D projectionby tracing rays from the viewpoint into the viewing volume RayCasting is much faster than RayTracing. The first uses much smaller amount of a rays for a window than the second.
+```
+42Cub3d/
+├── Makefile
+├── includes/
+│   └── cub3d.h            # t_data, t_player, t_ray, t_texrgbinfo, all error messages
+├── srcs/
+│   ├── main.c               # argv check, parsing() pipeline, start_game()
+│   ├── init_data.c           # zero-initializes t_data
+│   ├── header.c                # prints the startup banner
+│   ├── parsing/
+│   │   ├── permission.c        # check_file: extension, regular file, readable
+│   │   ├── map_copy.c            # reads the .cub file into memory
+│   │   ├── extract_data.c         # splits header (textures/colors) from the map grid
+│   │   ├── helps_to_extract.c      # per-line parsing helpers
+│   │   ├── check_textures.c         # validates texture paths + RGB values
+│   │   ├── check_map.c               # valid characters, single player, row_lengths
+│   │   └── check_map_closure.c        # wall-hole detection (per-cell neighbor check)
+│   ├── render/
+│   │   ├── prep_game.c          # loads textures, allocates the pixel buffer, spawns player
+│   │   ├── raycasting.c           # the per-column DDA loop + texture sampling
+│   │   ├── draw_game.c              # pushes the pixel buffer to the MLX42 image
+│   │   └── moving_n_keys.c           # key_hook / loop_hook: movement, rotation, collision
+│   └── utils/
+│       ├── error.c              # ft_error, print_err_msg
+│       ├── free_data.c           # cleanup: window, maps, textures, pixel buffer
+│       └── utils.c                # shared helpers
+├── libft/                    # custom libc subset (strings, memory, lists, printf, get_next_line)
+├── textures/                 # sample wall/floor/ceiling PNGs
+└── maps/                     # valid + invalid test maps used during development
+```
 
-In raycasting, walls are always 90 degrees angle with the floor. Floor and ceiling are untextured. Thus, the viewpoint cannot be rotated along the Z axis. 
+---
 
-The following attributes needed before the world could be projected and rendered:
-1. Player's height, player's field of view(FOV), and player's position.
-2. Projection plane's dimension.
-3. Relationship between player and projection plane.
+## Getting Started
 
-The FOV determines how wide the player sees the world in front of him/her. We define FOV to be 60 degrees. The player's height is defined to be 32 units high. 
+### macOS prerequisite
 
-Point of view of the player is - the player's X and Y coordinates, and teh angle that the player is facing. 
+MLX42 needs GLFW to build:
 
-The formula to calculate the length of ray is d = sqrt[(x2 - x1)^2 + (y2 - y1)^2];
+```sh
+brew install glfw
+```
 
-Add rays to each other, between them is the angle in the radians equal to 60/win_width. And number of rays will be = win_width.
+### MLX42
 
-The height of the wall calculates depending on the length of the ray touching this wall. So, the smaller the ray, the bigger will be the wall. And vice versa.
+The project depends on [MLX42](https://github.com/codam-coding-college/MLX42), a small cross-platform graphics library built on GLFW:
 
-![alt text](image.png)
+```sh
+git clone https://github.com/codam-coding-college/MLX42.git
+cd MLX42
+cmake -B build
+cmake --build build -j4
+```
 
-For the determining the direction/angle the player is pointing to, which texture the player is currently looking at. We need to understand that the line is y = kx + b, where k = dy / dx.
+### Build & Run
 
-Multiplying cos of the angle between two rays to the length of a single ray, to get rid of 'fish eye' thing. 
+```sh
+make
+./cub3d <path/to/map.cub>
+```
 
-![alt text](image-1.png)
+---
 
-When the player rotates, the camera has to rotate, so both the direction vector and the plane vector have to be rotated. To rotate a vector, the rotation matrix from linear algebra has to be used. The matrix:
+## Example Usage
 
-R = [cos θ  -sin θ]; [sin θ   cos θ]. Rotates points in the xy plan counterclockwise through an angle θ about the origin.
+```sh
+./cub3d maps/valid/simple.cub
+```
 
-![alt text](image-3.png)
+Trying an invalid map prints a specific error instead of a crash — for example:
 
-deltadist_x and deltadist_y are the distance the ray has to travel to go from 1 x-side to the next x-side, or from 1 y-side to the next y-side. Alright so delta here, is just the difference(length) between intersection of the line with one x-grid and the next one.
+```sh
+./cub3d maps/invalid/color_tests/test1.cub
+# Error: At least one of R,G,B colours is out of range [0, 255]
+```
 
-- deltadist_x = sqrt[(x2 - x1)^2 + (y2 - y1)^2];
-- deltadist_y = 1;
-- We want to know: how far does the ray travel to cross 1 unit in X. So (x2-x1) = 1:
-- SO, deltadist_x = sqrt(1 + (y2 - y1)^2);
-Now, slope of the line is (y2 - y1)/(x2 - x1). Since (x2-x1) = 1; slope = (y2 - y1)
-- SO, deltadist_x = sqrt(1 + (rayDirY / rayDirX)^2);
-- OR, deltadist_x = sqrt(1 + (rayDirY^2 / rayDirX^2));
-- deltadist_x = sqrt(rayDirX^2 / rayDirX^2 + rayDirY^2 / rayDirX^2);
-- deltadist_x = sqrt((rayDirX^2 + rayDirY^2) / rayDirX^2);
-- deltadist_x = sqrt(rayDirX^2 + rayDirY^2) / sqrt(rayDirX^2)
-- deltadist_x = sqrt(rayDirX^2 + rayDirY^2) / abs(rayDirX)
-- deltadist_x = abs(1 / rayDirX)
-- deltadist_y = abs(1 / rayDirY)
+---
 
- - mapX + 1.0 - posX → "How far until I reach the next vertical grid line?"
- - deltadist_x → "How much ray length corresponds to 1 unit of X movement?"
- - sidedist_x → "How far along the ray until I hit that vertical grid line?"
+## Status / Roadmap
 
- if sidedist_x smaller/lower than sidedist_y
-	we take one step/one unit in the x direction, to the x side/grid line
- else
-	we take one step in the y direction, to the y side
+- Mandatory part complete: parsing, validation, raycasting, textured walls, movement, rotation, clean exit
+- **Minimap** (2D top-down view with player position) — planned, not yet implemented
 
-ray->wall_x  is the point in the y axes or x axes depending on the value of the side, and it is calculated by moving from the initial position x or y by the wall dist multiplying to the dir x or y, to keep the right direction, and make sure that it finds the exact and true point intersection
+---
+
+## AI Usage
+
+AI was used to help build the startup header/banner shown in the terminal on launch (controls + project name), not for the parsing or rendering logic.
+
+---
 
 ## Resources
 
+- [Raycasting in Cub3D — Medium tutorial](https://devabdilah.medium.com/3d-ray-casting-game-with-cub3d-7a116376056a)
+- [Cub3D concepts writeup](https://mintlify.wiki/ibon-ira/Cub3d/introduction)
+- [Permadi's Raycasting Tutorial](https://permadi.com/1996/05/ray-casting-tutorial-1/#INTRODUCTION)
+- [Lode's Computer Graphics Tutorial — Raycasting](https://lodev.org/cgtutor/raycasting.html)
+- [Map parsing & validation notes](https://hackmd.io/@nszl/H1LXByIE2#Map-parsing-and-validating)
 
-- [RayCasting in Cub3D Medium Tutorial](https://devabdilah.medium.com/3d-ray-casting-game-with-cub3d-7a116376056a)
-- [Someone's Readme - Good for Concepts & Ideas](https://mintlify.wiki/ibon-ira/Cub3d/introduction)
-- [Raycasting Tutorial. Good explanation](https://permadi.com/1996/05/ray-casting-tutorial-1/#INTRODUCTION)
-- [Lode's Computer Graphics Tutorial - RayCasting](https://lodev.org/cgtutor/raycasting.html)
-- [Someone's Cub3D Explanation](https://hackmd.io/@nszl/H1LXByIE2#Map-parsing-and-validating)
-- [RayCasting Crazy Explanation in Russian Language](https://www.youtube.com/watch?v=XWCHl0rpBj4)
-- [The Best Explanation for people who love visualise](https://www.youtube.com/watch?v=eOCQfxRQ2pY)
+---
 
-## AI Usage
-- AI was used to create a beatiful header file, showing controls and the name of the project
+[↑ Back to top](#cub3d)
